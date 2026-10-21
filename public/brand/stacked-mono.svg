@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 330" width="360" height="330" role="img"><title>Fodan Sunday School Academy</title><g transform="translate(80 0)"><g>
+    <circle cx="100" cy="100" r="96" fill="#000"/><circle cx="100" cy="100" r="90" fill="none" stroke="#000" stroke-width="2.5"/>
+    <line x1="62.4" y1="64.3" x2="45.5" y2="58.2" stroke="#000" stroke-width="4" stroke-linecap="round"/><line x1="68.3" y1="53.6" x2="58.7" y2="46.3" stroke="#000" stroke-width="4" stroke-linecap="round"/><line x1="77.1" y1="45.2" x2="66.7" y2="30.5" stroke="#000" stroke-width="4" stroke-linecap="round"/><line x1="88.0" y1="39.9" x2="84.4" y2="28.4" stroke="#000" stroke-width="4" stroke-linecap="round"/><line x1="100.0" y1="38.0" x2="100.0" y2="20.0" stroke="#000" stroke-width="4" stroke-linecap="round"/><line x1="112.0" y1="39.9" x2="115.6" y2="28.4" stroke="#000" stroke-width="4" stroke-linecap="round"/><line x1="122.9" y1="45.2" x2="133.3" y2="30.5" stroke="#000" stroke-width="4" stroke-linecap="round"/><line x1="131.7" y1="53.6" x2="141.3" y2="46.3" stroke="#000" stroke-width="4" stroke-linecap="round"/><line x1="137.6" y1="64.3" x2="154.5" y2="58.2" stroke="#000" stroke-width="4" stroke-linecap="round"/>
+    <rect x="95.5" y="44" width="9" height="46" rx="2.5" fill="#000"/>
+    <rect x="83" y="56" width="34" height="9" rx="2.5" fill="#000"/>
+    <path d="M100 150 C84 140 62 138 42 144 L42 104 C62 98 84 100 100 110 Z" fill="#fff" stroke="#000" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M100 150 C116 140 138 138 158 144 L158 104 C138 98 116 100 100 110 Z" fill="#fff" stroke="#000" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M100 110 L100 150" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+    <path d="M52 116 C65 112 79 113 91 118 M52 126 C65 122 79 123 91 128 M52 136 C65 132 79 133 91 138" stroke="#000" stroke-width="2.2" fill="none" stroke-linecap="round" opacity=".5"/>
+    <path d="M148 116 C135 112 121 113 109 118 M148 126 C135 122 121 123 109 128 M148 136 C135 132 121 133 109 138" stroke="#000" stroke-width="2.2" fill="none" stroke-linecap="round" opacity=".5"/>
+    <path d="M100 168 L100 154" stroke="#000" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M100 160 C90 160 84 153 84 146 C92 146 100 150 100 160 Z M100 160 C110 160 116 153 116 146 C108 146 100 150 100 160 Z" fill="#000"/>
+  </g></g>
+  <text x="180" y="236" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="44" font-weight="700" fill="#000" letter-spacing="1">FODAN</text>
+  <text x="180" y="270" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="26" font-weight="700" fill="#000">Sunday School Academy</text>
+  <text x="180" y="300" text-anchor="middle" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="12.5" font-weight="700" fill="#000" letter-spacing="2">TEACH. LEARN. GROW IN THE WORD.</text></svg>
