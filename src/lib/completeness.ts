@@ -14,8 +14,8 @@ export interface LessonLike {
 
 export const MIN = {
   title: 4, summary: 120, theme: 10, objective: 25, objectives: 3, term: 20, terms: 3,
-  introduction: 250, context: 250, observations: 200, pointBody: 280, points: 3, pointHeading: 6,
-  discussion: 4, discussionQ: 20, guidance: 80, application: 200, activity: 120, takeHome: 80, prayer: 60, teacherGuidance: 150, assessmentNote: 40,
+  introduction: 250, context: 250, observations: 200, pointBody: 240, points: 3, pointHeading: 6,
+  discussion: 4, discussionQ: 20, guidance: 60, application: 200, activity: 120, takeHome: 80, prayer: 60, teacherGuidance: 150, assessmentNote: 40,
   totalWords: 450,
 };
 
