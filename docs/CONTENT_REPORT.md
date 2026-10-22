@@ -5,11 +5,11 @@ Generated 2026-10-22 by `npm run content:report`.
 | Measure | Value |
 |---|---|
 | Curricula in catalogue | 50 |
-| Curricula with authored content | 4 |
-| Curricula passing every completeness rule | 4 |
-| Lesson units complete | 104 of 1300 |
-| Teaching words in complete lessons | 72,149 |
-| Questions in banks | 416 |
+| Curricula with authored content | 5 |
+| Curricula passing every completeness rule | 5 |
+| Lesson units complete | 130 of 1300 |
+| Teaching words in complete lessons | 89,264 |
+| Questions in banks | 520 |
 
 "Passes" means: 26 units present; every unit has a title, summary, theme, Scripture that resolves to real Bible text, memory verse, 3+ objectives, 3+ key terms, introduction, context, exegetical observations, 3+ teaching points, 4+ discussion questions with facilitator guidance, application, activity, take-home, prayer, teacher guidance and assessment note above minimum sizes; no placeholder text; no paragraph repeated across lessons; both blueprints present; and enough approved questions to draw a mid-session test (weeks 1-12) and a final examination (both halves). **It does not mean the content has been theologically reviewed.** Every curriculum waits for a human reviewer before it can be published to churches.
 
@@ -19,7 +19,7 @@ Generated 2026-10-22 by `npm run content:report`.
 | 2 | The Nature and Attributes of God | passes | 26/26 | 16,361 | 104 |
 | 3 | Creation, Humanity and the Image of God | passes | 26/26 | 15,727 | 104 |
 | 4 | The Fall of Man and the Consequences of Sin | passes | 26/26 | 17,089 | 104 |
-| 5 | The Covenants of God | not yet authored | 0/26 | 0 | 0 |
+| 5 | The Covenants of God | passes | 26/26 | 17,115 | 104 |
 | 6 | The Life and Ministry of Jesus Christ | not yet authored | 0/26 | 0 | 0 |
 | 7 | The Death and Resurrection of Christ | not yet authored | 0/26 | 0 | 0 |
 | 8 | The Person and Work of the Holy Spirit | not yet authored | 0/26 | 0 | 0 |

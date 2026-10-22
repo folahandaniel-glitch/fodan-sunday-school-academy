@@ -4,10 +4,12 @@ import { lessons as c01 } from "./curricula/c01";
 import { lessons as c02 } from "./curricula/c02";
 import { lessons as c03 } from "./curricula/c03";
 import { lessons as c04 } from "./curricula/c04";
+import { lessons as c05 } from "./curricula/c05";
 
 export const CONTENT: Record<number, LessonSeed[]> = {
   1: c01,
   2: c02,
   3: c03,
   4: c04,
+  5: c05,
 };
