@@ -76,20 +76,31 @@ async function Section({ s }: { s: SiteSection }) {
       return (<section className="container-page py-12"><div className="hero-bg rounded-2xl p-8 text-center text-white sm:p-12"><h2 className="!text-white text-2xl sm:text-3xl">{t(d, "title")}</h2><p className="mx-auto mt-2 max-w-xl text-white/85">{t(d, "body")}</p><Link className="btn btn-gold mt-6" href={t(d, "href") || "/register/church"}>{t(d, "label")}</Link></div></section>);
     case "contact":
       return (<section className="container-page max-w-2xl py-12"><h1 className="mb-2 text-3xl">{t(d, "title")}</h1><p className="mb-6 text-mist">{t(d, "body")}</p><ContactForm /></section>);
+    case "founder":
+      return (
+        <section className="bg-ivory py-12"><div className="container-page grid items-center gap-8 md:grid-cols-[280px_1fr]">
+          {t(d, "image") && <div className="mx-auto w-full max-w-[280px]"><img src={t(d, "image")} alt={t(d, "imageAlt")} width={560} height={560} loading="lazy" className="aspect-square w-full rounded-2xl border-4 border-white object-cover object-top shadow-lg" /></div>}
+          <div>
+            {t(d, "eyebrow") && <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-gold-700">{t(d, "eyebrow")}</p>}
+            <h2 className="text-2xl sm:text-3xl">{t(d, "name")}</h2>
+            {t(d, "role") && <p className="mb-4 font-semibold text-brand">{t(d, "role")}</p>}
+            <Markdown text={t(d, "body")} />
+          </div>
+        </div></section>
+      );
     case "pricing": {
       const plans = await publicPlans();
       return (
         <section className="container-page py-12">
           <h1 className="mb-2 text-3xl">{t(d, "title") || "Plans"}</h1>
-          <p className="mb-6 max-w-2xl text-mist">{t(d, "body") || "Start free. Paid plans add capacity and features. Prices are set by the Academy and shown here when a plan is available."}</p>
-          <div className="grid gap-4 md:grid-cols-3">
+          <p className="mb-6 max-w-2xl text-mist">{t(d, "body") || "Every church starts free for 30 days with no access code. Choose a yearly package to keep going and unlock more learners, classes and features."}</p>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             {plans.map((p) => (
               <div key={p.id} className="card card-pad flex flex-col"><h3 className="text-xl">{p.name}</h3><p className="mt-1 text-sm text-mist">{p.description}</p>
-                <p className="mt-4 font-display text-3xl text-navy">{p.priceMinor === 0 ? "Free" : formatMoney(p.priceMinor, p.currency)}{p.priceMinor > 0 && <span className="text-sm text-mist"> / {p.billingInterval}</span>}</p>
+                <p className="mt-4 font-display text-3xl text-navy">{p.priceMinor === 0 ? "Free" : formatMoney(p.priceMinor, p.currency)}{p.priceMinor === 0 && p.trialDays > 0 && <span className="text-sm text-mist"> for {p.trialDays} days</span>}{p.priceMinor > 0 && <span className="text-sm text-mist"> / {p.billingInterval === "yearly" ? "year" : p.billingInterval}</span>}</p>
                 <ul className="mt-4 flex-1 space-y-1 text-sm">{p.display.highlights.map((h) => <li key={h}>✓ {h}</li>)}</ul>
-                <Link className="btn btn-primary mt-5" href="/register/church">Register your church</Link></div>))}
+                <Link className="btn btn-primary mt-5" href="/register/church">{p.priceMinor === 0 ? "Register your church" : "Register with a code"}</Link></div>))}
           </div>
-          {plans.length <= 1 && <p className="mt-6 text-sm text-mist">More plans with higher limits and extra features will appear here when the Academy activates them.</p>}
         </section>
       );
     }

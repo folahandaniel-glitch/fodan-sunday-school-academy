@@ -17,11 +17,52 @@ async function planId(code: string) {
 }
 
 describe("church access codes", () => {
-  it("seeds the five packages in order", async () => {
+  it("seeds exactly the five agreed packages, with no duplicates and the agreed prices", async () => {
     const db = await getDb();
-    const rows = await db.select().from(schema.subscriptionPlans);
-    const codes = rows.filter((p) => p.status !== "retired").sort((a, b) => a.sortOrder - b.sortOrder).map((p) => p.code);
-    expect(codes).toEqual(["free", "silver", "bronze", "gold", "premium"]);
+    const rows = (await db.select().from(schema.subscriptionPlans)).sort((a, b) => a.sortOrder - b.sortOrder);
+    expect(rows.map((p) => p.code)).toEqual(["free", "silver", "bronze", "gold", "premium"]);
+    expect(new Set(rows.map((p) => p.name)).size).toBe(rows.length);
+    expect(rows.every((p) => p.status === "active")).toBe(true);
+    const price = Object.fromEntries(rows.map((p) => [p.code, [p.priceMinor, p.currency, p.billingInterval, p.trialDays]]));
+    expect(price.free).toEqual([0, "NGN", "free", 30]);
+    expect(price.silver).toEqual([1000, "USD", "yearly", 0]);
+    expect(price.bronze).toEqual([1500, "USD", "yearly", 0]);
+    expect(price.gold).toEqual([2000, "USD", "yearly", 0]);
+    expect(price.premium).toEqual([2500, "USD", "yearly", 0]);
+  });
+
+  it("features only grow as packages go up (no contradictions)", async () => {
+    const db = await getDb();
+    const rows = (await db.select().from(schema.subscriptionPlans)).sort((a, b) => a.sortOrder - b.sortOrder);
+    const ents = await db.select().from(schema.planEntitlements);
+    const val = (code: string, key: string) => { const id = rows.find((p) => p.code === code)!.id; const e = ents.find((x) => x.planId === id && x.featureKey === key); return e ? (e.limitValue === null ? Infinity : e.limitValue) : 0; };
+    for (const key of ["maxLearners", "maxClasses", "maxActiveSessions", "maxAdmins", "examsPerSession", "curriculumTier", "downloads", "certificates", "advancedReports", "customBranding", "aiAssist", "storageMb"]) {
+      for (let i = 1; i < rows.length; i++) expect(val(rows[i].code, key), key + " " + rows[i].code).toBeGreaterThanOrEqual(val(rows[i - 1].code, key));
+    }
+  });
+
+  it("the Free package needs no code, and codes cannot be generated for it", async () => {
+    const r = await generateAccessCodes(actor, { planId: await planId("free"), quantity: 1, durationDays: 30, maxUses: 1, redeemBy: null, note: "" });
+    expect(r.ok).toBe(false);
+  });
+
+  it("a new church gets 30 free days, then has no entitlements until it redeems a code", async () => {
+    const ch = await makeChurch("Trial Church " + uniq("t"));
+    const p = await effectivePlan(ch.orgId);
+    expect(p.code).toBe("free");
+    expect(p.endAt!.getTime() - Date.now()).toBeGreaterThan(29 * 86_400_000);
+    expect(p.endAt!.getTime() - Date.now()).toBeLessThanOrEqual(30 * 86_400_000);
+    const db = await getDb();
+    await db.update(schema.organizationSubscriptions).set({ endAt: new Date(Date.now() - 1000) }).where(eq(schema.organizationSubscriptions.organizationId, ch.orgId));
+    const ended = await effectivePlan(ch.orgId);
+    expect(ended.status).toBe("expired");
+    expect(Object.keys(ended.entitlements)).toHaveLength(0);
+    const gen = await generateAccessCodes(actor, { planId: await planId("silver"), quantity: 1, durationDays: 365, maxUses: 1, redeemBy: null, note: "" });
+    const code = (gen as { codes: string[] }).codes[0];
+    const { redeemAccessCodeForOrg } = await import("@/server/services/access-codes");
+    const r = await redeemAccessCodeForOrg(ch.orgId, ch.userId, code);
+    expect(r.ok).toBe(true);
+    expect((await effectivePlan(ch.orgId)).code).toBe("silver");
   });
 
   it("a church that registers with a Gold code starts on Gold and receives its own member code", async () => {

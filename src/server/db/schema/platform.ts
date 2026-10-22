@@ -80,7 +80,7 @@ export const sitePages = pgTable("site_pages", {
   sections: jsonb("sections").$type<SiteSection[]>().notNull().default([]),
   draftSections: jsonb("draft_sections").$type<SiteSection[] | null>(),
   status: text("status").$type<"draft" | "published">().notNull().default("published"),
-  seo: jsonb("seo").$type<{ title?: string; description?: string }>().notNull().default({}),
+  seo: jsonb("seo").$type<{ title?: string; description?: string; founderSeeded?: boolean }>().notNull().default({}),
   publishedAt: tstz("published_at"), updatedBy: uuid("updated_by"),
   createdAt: created(), updatedAt: updated(),
 });

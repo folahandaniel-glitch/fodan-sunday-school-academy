@@ -8,6 +8,7 @@ import * as exams from "@/server/services/exams";
 import * as sched from "@/server/services/schedule";
 import * as cert from "@/server/services/certificates";
 import * as billing from "@/server/services/billing";
+import * as accessCodes from "@/server/services/access-codes";
 import { audit } from "@/server/audit";
 import type { OrgRole } from "@/server/db/schema";
 import { toMinor } from "@/lib/money";
@@ -214,5 +215,11 @@ export async function checkoutAction(fd: FormData) {
   if (!r.ok) redirect(`/church/billing?error=${encodeURIComponent(r.error)}`);
   await audit({ id: user.id, label: user.fullName }, "billing.redirect_to_checkout", { type: "payment", id: r.reference }, {}, { orgId: ctx.orgId });
   redirect(r.url);
+}
+export async function redeemAccessCodeAction(fd: FormData) {
+  const { ctx, user } = await requireOrg("billing.manage");
+  const r = await accessCodes.redeemAccessCodeForOrg(ctx.orgId, user.id, String(fd.get("accessCode") ?? ""));
+  if (!r.ok) redirect(`/church/billing?error=${encodeURIComponent(r.error)}`);
+  redirect(`/church/billing?activated=${encodeURIComponent(r.planName)}`);
 }
 export { toMinor };

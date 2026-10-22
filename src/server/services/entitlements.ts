@@ -16,7 +16,11 @@ export const TIER_RANK = { free: 0, standard: 1, premium: 2 } as const;
 
 export interface EffectivePlan { planId: string; code: string; name: string; status: string; endAt: Date | null; entitlements: Record<string, number | null> }
 
-/** The plan that governs a church RIGHT NOW. A lapsed paid plan falls back to Free after the grace period; history is never deleted. */
+/**
+ * The plan that governs a church RIGHT NOW. A paid plan keeps working through the grace period after its end date; the Free 30-day start has no grace.
+ * When a church's plan has ended and nothing replaces it, the church has NO entitlements until it renews or redeems an access code (status "expired").
+ * Churches that never had a subscription at all (for example a church listed by a member and not yet claimed) are treated as Free. History is never deleted.
+ */
 export async function effectivePlan(orgId: string): Promise<EffectivePlan> {
   const db = await getDb();
   const grace = (await getSetting("features")).graceDays;
@@ -24,19 +28,23 @@ export async function effectivePlan(orgId: string): Promise<EffectivePlan> {
     .innerJoin(schema.subscriptionPlans, eq(schema.subscriptionPlans.id, schema.organizationSubscriptions.planId))
     .where(eq(schema.organizationSubscriptions.organizationId, orgId)).orderBy(desc(schema.organizationSubscriptions.createdAt));
   const now = Date.now();
-  const live = subs.find(({ s }) => {
+  const live = subs.find(({ s, p }) => {
     if (s.status === "cancelled" || s.status === "expired") return false;
     if (!s.endAt) return true;
-    return s.endAt.getTime() + grace * 86_400_000 > now;
+    const g = p.billingInterval === "free" ? 0 : grace;
+    return s.endAt.getTime() + g * 86_400_000 > now;
   });
-  let chosen = live?.p;
-  let sub = live?.s;
-  if (!chosen) {
-    const [free] = await db.select().from(schema.subscriptionPlans).where(eq(schema.subscriptionPlans.code, "free"));
-    chosen = free; sub = undefined;
+  if (live) {
+    const ents = await db.select().from(schema.planEntitlements).where(eq(schema.planEntitlements.planId, live.p.id));
+    return { planId: live.p.id, code: live.p.code, name: live.p.name, status: live.s.status, endAt: live.s.endAt ?? null, entitlements: Object.fromEntries(ents.map((x) => [x.featureKey, x.limitValue])) };
   }
-  const ents = await db.select().from(schema.planEntitlements).where(eq(schema.planEntitlements.planId, chosen.id));
-  return { planId: chosen.id, code: chosen.code, name: chosen.name, status: sub?.status ?? "default", endAt: sub?.endAt ?? null, entitlements: Object.fromEntries(ents.map((e) => [e.featureKey, e.limitValue])) };
+  if (subs.length > 0) {
+    const last = subs[0];
+    return { planId: last.p.id, code: last.p.code, name: last.p.name, status: "expired", endAt: last.s.endAt ?? null, entitlements: {} };
+  }
+  const [free] = await db.select().from(schema.subscriptionPlans).where(eq(schema.subscriptionPlans.code, "free"));
+  const ents = await db.select().from(schema.planEntitlements).where(eq(schema.planEntitlements.planId, free.id));
+  return { planId: free.id, code: free.code, name: free.name, status: "default", endAt: null, entitlements: Object.fromEntries(ents.map((x) => [x.featureKey, x.limitValue])) };
 }
 
 /** null = unlimited. Missing key = 0 (denied). */
@@ -49,7 +57,7 @@ export async function hasFeature(orgId: string, key: string) {
   return l === null || l > 0;
 }
 export async function assertFeature(orgId: string, key: string) {
-  if (!(await hasFeature(orgId, key))) throw new EntitlementError(`${FEATURE_LABELS[key] ?? key} is not included in your church's current plan.`, key);
+  if (!(await hasFeature(orgId, key))) throw new EntitlementError((await effectivePlan(orgId)).status === "expired" ? "Your church's plan has ended. Renew your package or enter an access code under Billing to continue." : `${FEATURE_LABELS[key] ?? key} is not included in your church's current plan.`, key);
 }
 /** Throws when adding `adding` to `current` would exceed the plan limit. */
 export async function assertWithinLimit(orgId: string, key: string, current: number, adding = 1) {

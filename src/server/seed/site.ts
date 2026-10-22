@@ -6,6 +6,21 @@ export interface PageSeed { slug: string; title: string; kind: "page" | "legal" 
 
 const LEGAL_NOTE = "This notice is a working template prepared for the platform. It has not yet been reviewed by a lawyer. The Super Admin should have it reviewed against Nigerian data-protection and child-protection requirements, and the laws of any other country where the service is used, before relying on it.";
 
+/** Shown on the home page; also appended once to databases seeded before this section existed. */
+export const FOUNDER_SECTION: SiteSection = s("founder", "founder", {
+  image: "/brand/founder.webp",
+  imageAlt: "Banjo Folahan Daniel, Founder and President of Fodan Gospel Outreach",
+  eyebrow: "The President and the ministry behind the Academy",
+  name: "Banjo Folahan Daniel",
+  role: "Founder and President, Fodan Gospel Outreach",
+  body: [
+    "Fodan Sunday School Academy is a ministry of **Fodan Gospel Outreach (FGO)**, founded and led by **Banjo Folahan Daniel**, and sponsored by **The Living Youth International**.",
+    "## What Fodan Gospel Outreach represents",
+    "*Raising Youth With Fire, Families With Light, and Generations With Christ.*",
+    "FGO exists to see Jesus Christ proclaimed, believers taught and equipped, and families and communities strengthened, from generation to generation and from nation to nation. This Academy puts that vision to work in the local church: sound Bible teaching, planned and taught in order, week by week.",
+  ].join("\n\n"),
+});
+
 export const PAGES: PageSeed[] = [
   {
     slug: "home", title: "Home", kind: "home", seo: { title: "Fodan Sunday School Academy", description: "Choose a sound Bible curriculum, schedule a full six-month programme, teach with structured notes, and assess with CBT examinations." },
@@ -31,8 +46,9 @@ export const PAGES: PageSeed[] = [
           { title: "Assess and celebrate", body: "Week 13 is the mid-session test, week 25 the final examination and week 26 revision. Eligible learners receive verifiable certificates." },
         ],
       }),
+      FOUNDER_SECTION,
       s("cats", "categories", { title: "Five categories of Bible teaching" }),
-      s("cta", "cta", { title: "Start with one session", body: "Registering a church is free. Choose a curriculum, set your opening Sunday and begin.", label: "Register your church", href: "/register/church" }),
+      s("cta", "cta", { title: "Start with one session", body: "Registering a church is free, and every church starts with 30 free days. Choose a curriculum, set your opening Sunday and begin.", label: "Register your church", href: "/register/church" }),
     ],
   },
   {
@@ -82,7 +98,7 @@ export const PAGES: PageSeed[] = [
       s("faq", "faq", {
         title: "Frequently asked questions",
         items: [
-          { q: "Is the Academy free?", a: "Registration is free and the free plan covers a limited number of learners and classes. Paid plans with more capacity and features are configured by the Academy and appear on the Pricing page when available." },
+          { q: "Is the Academy free?", a: "Every church starts free for 30 days, with no access code needed. After that you choose a yearly package (Silver, Bronze, Gold or Premium) or enter an access code from the Academy. The Pricing page shows what each package includes." },
           { q: "Can a church see another church's learners or results?", a: "No. Every church works in a private space. The system checks on the server that every record belongs to your church before showing or changing it." },
           { q: "I cannot find my church in the list when I register.", a: "Type your church's name instead. It will be listed as awaiting verification, and the church's administrator can then claim it and approve members. Until your church is verified you can still use the community forum." },
           { q: "What can members of other churches see?", a: "Only the community forum is shared across churches. Lessons, classes, attendance and results are visible only to your own church." },
@@ -111,3 +127,4 @@ export const PAGES: PageSeed[] = [
     sections: [s("legal", "text", { title: "Accessibility statement", body: `We aim to meet WCAG 2.2 level AA. The site supports keyboard navigation, visible focus, semantic headings, labelled forms and sufficient colour contrast, and the examination timer announces warnings to screen readers.\n\nThis is a target, not a certification: the platform has not yet had a full external accessibility audit. If you meet a barrier, please tell us on the Contact page and we will help and fix it.` })],
   },
 ];
+

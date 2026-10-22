@@ -13,6 +13,7 @@ const SCHEMA: Record<string, { label: string; fields: Field[]; items?: { key: st
   cta: { label: "Call to action", fields: [["title", "Title"], ["body", "Text", "area"], ["label", "Button text"], ["href", "Button link"]] },
   contact: { label: "Contact form", fields: [["title", "Title"], ["body", "Introduction", "area"]] },
   categories: { label: "Curriculum categories (automatic)", fields: [["title", "Section title"]] },
+  founder: { label: "Founder or President profile (photo and message)", fields: [["image", "Photo link (for example /brand/founder.webp)"], ["imageAlt", "Photo description for screen readers"], ["eyebrow", "Small heading above"], ["name", "Name"], ["role", "Title"], ["body", "Message (blank line between paragraphs; ## Heading; **bold**; *italic*)", "area"]] },
   pricing: { label: "Pricing plans (automatic)", fields: [["title", "Section title"], ["body", "Introduction", "area"]] },
 };
 

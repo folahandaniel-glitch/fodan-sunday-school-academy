@@ -15,7 +15,7 @@ export default async function AccessCodes({ searchParams }: { searchParams: Prom
   const sp = await searchParams;
   const [plans, codes] = await Promise.all([allPlans(), listAccessCodes()]);
   const fresh = (sp.new ?? "").split(",").filter(Boolean);
-  const offered = plans.filter((p) => p.status !== "retired");
+  const offered = plans.filter((p) => p.status !== "retired" && p.billingInterval !== "free");
   return (
     <>
       <PageHeader title="Church access codes" sub="Give a church a code that sets its package when it registers. Once registered, the church receives its own member code, which its members enter when they join. Packages (features, limits and prices) are edited under Subscription Plans." />
@@ -26,7 +26,7 @@ export default async function AccessCodes({ searchParams }: { searchParams: Prom
         </Alert></div>
       )}
       <Card>
-        <h2 className="text-lg">Generate codes</h2>
+        <h2 className="text-lg">Generate codes</h2><p className="mt-1 text-sm text-mist">The Free package needs no code: every church starts on it for 30 days. Codes are for the paid packages.</p>
         <ActionForm action={generateAccessCodesAction} submit="Generate" className="mt-3">
           <div className="grid gap-3 sm:grid-cols-4">
             <div className="sm:col-span-2"><label className="label" htmlFor="planId">Package</label>

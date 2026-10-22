@@ -65,9 +65,9 @@ async function uniqueSlug(db: DB | Tx, base: string) {
   return `${root}-${Date.now()}`;
 }
 
-async function freePlanId(db: DB | Tx) {
-  const [p] = await db.select({ id: schema.subscriptionPlans.id }).from(schema.subscriptionPlans).where(eq(schema.subscriptionPlans.code, "free"));
-  return p?.id;
+async function freePlan(db: DB | Tx) {
+  const [p] = await db.select({ id: schema.subscriptionPlans.id, trialDays: schema.subscriptionPlans.trialDays }).from(schema.subscriptionPlans).where(eq(schema.subscriptionPlans.code, "free"));
+  return p;
 }
 
 async function issueEmailVerification(userId: string, to: string, db?: DB | Tx) {
@@ -113,8 +113,8 @@ export async function registerChurch(input: ChurchRegistration, actor: Actor | n
       await tx.insert(schema.organizationMemberships).values({ organizationId: orgId, userId: user.id, role: "church_admin", status: "active", joinedAt: new Date() }).onConflictDoNothing();
       const [o2] = await tx.select({ jc: schema.organizations.joinCode }).from(schema.organizations).where(eq(schema.organizations.id, orgId));
       if (!o2.jc) await tx.update(schema.organizations).set({ joinCode: friendlyCode() }).where(eq(schema.organizations.id, orgId));
-      const plan = await freePlanId(tx);
-      if (plan) await tx.insert(schema.organizationSubscriptions).values({ organizationId: orgId, planId: plan, status: "active", source: "default" });
+      const plan = await freePlan(tx);
+      if (plan) await tx.insert(schema.organizationSubscriptions).values({ organizationId: orgId, planId: plan.id, status: "active", source: "default", endAt: plan.trialDays > 0 ? new Date(Date.now() + plan.trialDays * 86_400_000) : null });
       if (d.accessCode) await redeemAccessCodeTx(tx, d.accessCode, orgId, user.id);
       await audit(actor, d.claimOrgId ? "church.claimed" : "church.registered", { type: "organization", id: orgId }, { adminUserId: user.id }, { orgId, db: tx });
       const [jc] = await tx.select({ jc: schema.organizations.joinCode }).from(schema.organizations).where(eq(schema.organizations.id, orgId));

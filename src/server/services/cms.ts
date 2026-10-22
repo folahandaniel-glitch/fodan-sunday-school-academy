@@ -9,7 +9,7 @@ import type { SiteSection } from "../db/schema";
 import { NotFoundError, AccessError } from "../org";
 
 /* ============================ Pages (structured sections, never raw HTML) ============================ */
-export const SECTION_TYPES = ["hero", "text", "features", "steps", "categories", "faq", "cta", "contact", "pricing"] as const;
+export const SECTION_TYPES = ["hero", "text", "features", "steps", "categories", "faq", "cta", "contact", "pricing", "founder"] as const;
 
 export async function getPublishedPage(slug: string) {
   const db = await getDb();

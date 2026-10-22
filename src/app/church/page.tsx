@@ -18,7 +18,9 @@ export default async function ChurchHome({ searchParams }: { searchParams: Promi
   const active = progs.filter((p) => p.a.status === "active");
   return (
     <>
-      <PageHeader title={ctx.orgName} sub={`${plan.plan.name} plan`} />
+      <PageHeader title={ctx.orgName} sub={`${plan.plan.name} plan${plan.plan.status === "expired" ? " (ended)" : plan.plan.endAt ? ` · until ${fmtDate(plan.plan.endAt)}` : ""}`} />
+      {plan.plan.status === "expired" && <div className="mb-4"><Alert tone="warn"><strong>Your plan has ended.</strong> <Link href="/church/billing" className="font-semibold">Choose a package or enter an access code</Link> to keep teaching. Nothing has been deleted.</Alert></div>}
+      {plan.plan.status !== "expired" && plan.plan.code === "free" && plan.plan.endAt && plan.plan.endAt.getTime() - Date.now() < 7 * 86_400_000 && <div className="mb-4"><Alert tone="warn">Your free 30 days end on {fmtDate(plan.plan.endAt)}. <Link href="/church/billing" className="font-semibold">Choose a package or enter an access code</Link> to continue without a break.</Alert></div>}
       {sp.welcome && <div className="mb-4"><Alert tone="ok"><strong>Your church is registered.</strong> Next steps: 1) invite teachers and learners (share your join code below) · 2) create classes · 3) choose a curriculum and a session.</Alert></div>}
       {org.joinCode && ctx.role === "church_admin" && <div className="mb-4"><Alert tone="info">Give this church member code to your members. When they register, choose your church and enter it: they are approved straight away. Your church member code: <strong className="font-mono text-base">{org.joinCode}</strong></Alert></div>}
       {o.pending > 0 && <div className="mb-4"><Alert tone="warn"><Link href="/church/members?status=pending" className="font-semibold">{o.pending} member(s) are waiting for your approval.</Link></Alert></div>}

@@ -20,6 +20,7 @@ export async function generateAccessCodes(actor: Actor, d: GenerateInput): Promi
   const [plan] = await db.select().from(schema.subscriptionPlans).where(eq(schema.subscriptionPlans.id, d.planId));
   if (!plan) return fail("Choose a package.");
   if (plan.status === "retired") return fail("That package is retired. Choose another one or reactivate it first.");
+  if (plan.billingInterval === "free") return fail("The Free package needs no access code. Choose a paid package.");
   const prefix = plan.code.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8) || "FSSA";
   const codes: string[] = [];
   await db.transaction(async (tx) => {
@@ -92,4 +93,19 @@ export async function redeemAccessCodeTx(tx: Tx, raw: string, orgId: string, use
   await tx.update(schema.churchAccessCodes).set({ usedCount: c.usedCount + 1 }).where(eq(schema.churchAccessCodes.id, c.id));
   await audit(null, "accesscode.redeemed", { type: "access_code", id: c.id }, { orgId, plan: plan.code }, { orgId, db: tx });
   return { planName: plan.name };
+}
+
+/** A church administrator redeems a code on an existing church (to upgrade, or to renew after the Free 30 days). */
+export async function redeemAccessCodeForOrg(orgId: string, userId: string, raw: string): Promise<Result<{ planName: string }>> {
+  const ck = await checkAccessCode(raw);
+  if (!ck.ok) return ck;
+  const db = await getDb();
+  try {
+    const r = await db.transaction((tx) => redeemAccessCodeTx(tx, raw, orgId, userId));
+    return { ok: true, planName: r.planName };
+  } catch (e) {
+    if ((e as Error).message === "BAD_ACCESS_CODE") return fail("That access code could not be used. It may have just been used or withdrawn.", "accessCode");
+    if ((e as { code?: string }).code === "23505") return fail("This church has already used that access code.", "accessCode");
+    throw e;
+  }
 }

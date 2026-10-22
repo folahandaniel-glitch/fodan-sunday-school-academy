@@ -4,7 +4,7 @@ import * as s from "../db/schema";
 import { CATALOG, CATEGORIES } from "@/content/catalog";
 import { CONTENT } from "@/content/registry";
 import { buildBlueprints, buildLessons, type BuiltLesson } from "@/content/build";
-import { PAGES } from "./site";
+import { PAGES, FOUNDER_SECTION } from "./site";
 import { sha256 } from "../crypto";
 import { validateCurriculum } from "@/lib/completeness";
 import { loadDefaultLogos } from "./logos";
@@ -36,27 +36,33 @@ async function seedBaseline(db: DB) {
       categoryId: catId.get(e.cat), tags: e.tags, audience: e.audience, level: e.level, themes: e.themes, outcomes: e.outcomes, doctrinalNotes: e.note, status: "draft", accessTier: "free", visibility: "public",
     }).onConflictDoNothing({ target: s.curricula.slug });
   }
-  // Plans (prices are the Super Admin's decision; paid plans start as hidden drafts)
+  // Packages. Exactly five: Free (30 days, no code needed) and Silver, Bronze, Gold, Premium (USD per year). The Super Admin can edit any of them and add more.
   const plans = [
-    { code: "free", name: "Free", description: "For churches starting out: one active session, a limited number of learners and the essentials.", status: "active" as const, interval: "free" as const, sort: 0,
-      ent: { maxLearners: 100, maxClasses: 5, maxActiveSessions: 1, maxAdmins: 2, examsPerSession: 4, curriculumTier: 0, downloads: 1, certificates: 0, advancedReports: 0, customBranding: 0, aiAssist: 0, storageMb: 50 }, hi: ["Up to 100 learners", "Up to 5 classes", "One active session", "Mid-session test and final examination", "Community forum"] },
-    { code: "silver", name: "Silver", description: "Small and growing churches: more learners and classes, certificates and downloadable lesson materials.", status: "draft" as const, interval: "yearly" as const, sort: 1,
+    { code: "free", name: "Free", description: "Start with the essentials for 30 days, with no access code needed.", status: "active" as const, interval: "free" as const, sort: 0, priceMinor: 0, trialDays: 30,
+      ent: { maxLearners: 100, maxClasses: 5, maxActiveSessions: 1, maxAdmins: 2, examsPerSession: 4, curriculumTier: 0, downloads: 1, certificates: 0, advancedReports: 0, customBranding: 0, aiAssist: 0, storageMb: 50 }, hi: ["Free for 30 days, no access code needed", "Up to 100 learners", "Up to 5 classes", "One active session", "Mid-session test and final examination", "Community forum"] },
+    { code: "silver", name: "Silver", description: "Small and growing churches: more learners and classes, certificates and downloadable lesson materials.", status: "active" as const, interval: "yearly" as const, sort: 1, priceMinor: 1000, trialDays: 0,
       ent: { maxLearners: 250, maxClasses: 15, maxActiveSessions: 1, maxAdmins: 3, examsPerSession: 8, curriculumTier: 1, downloads: 1, certificates: 1, advancedReports: 0, customBranding: 0, aiAssist: 0, storageMb: 250 }, hi: ["Up to 250 learners", "Up to 15 classes", "Certificates", "Downloadable lesson materials", "Standard-tier curricula"] },
-    { code: "bronze", name: "Bronze", description: "Established churches: two active sessions, more administrators and advanced reports.", status: "draft" as const, interval: "yearly" as const, sort: 2,
+    { code: "bronze", name: "Bronze", description: "Established churches: two active sessions, more administrators and advanced reports.", status: "active" as const, interval: "yearly" as const, sort: 2, priceMinor: 1500, trialDays: 0,
       ent: { maxLearners: 600, maxClasses: 40, maxActiveSessions: 2, maxAdmins: 5, examsPerSession: 12, curriculumTier: 1, downloads: 1, certificates: 1, advancedReports: 1, customBranding: 0, aiAssist: 0, storageMb: 500 }, hi: ["Up to 600 learners", "Up to 40 classes", "Two active sessions", "Advanced reports", "Certificates"] },
-    { code: "gold", name: "Gold", description: "Large churches: high limits, church branding and every curriculum tier.", status: "draft" as const, interval: "yearly" as const, sort: 3,
+    { code: "gold", name: "Gold", description: "Large churches: high limits, church branding and every curriculum tier.", status: "active" as const, interval: "yearly" as const, sort: 3, priceMinor: 2000, trialDays: 0,
       ent: { maxLearners: 1500, maxClasses: 100, maxActiveSessions: 4, maxAdmins: 10, examsPerSession: 24, curriculumTier: 2, downloads: 1, certificates: 1, advancedReports: 1, customBranding: 1, aiAssist: 0, storageMb: 2000 }, hi: ["Up to 1,500 learners", "Up to 100 classes", "Four active sessions", "Church branding", "All curricula"] },
-    { code: "premium", name: "Premium", description: "Large churches and networks: no limits, advanced reports, church branding and AI-assisted tools.", status: "draft" as const, interval: "yearly" as const, sort: 4,
-      ent: { maxLearners: null, maxClasses: null, maxActiveSessions: null, maxAdmins: null, examsPerSession: null, curriculumTier: 2, downloads: 1, certificates: 1, advancedReports: 1, customBranding: 1, aiAssist: 1, storageMb: 5000 }, hi: ["Unlimited learners and classes", "Advanced reports", "Church branding", "All curricula"] },
+    { code: "premium", name: "Premium", description: "Large churches and networks: no limits, advanced reports, church branding and AI-assisted tools.", status: "active" as const, interval: "yearly" as const, sort: 4, priceMinor: 2500, trialDays: 0,
+      ent: { maxLearners: null, maxClasses: null, maxActiveSessions: null, maxAdmins: null, examsPerSession: null, curriculumTier: 2, downloads: 1, certificates: 1, advancedReports: 1, customBranding: 1, aiAssist: 1, storageMb: 5000 }, hi: ["Unlimited learners and classes", "Unlimited active sessions", "Advanced reports", "Church branding", "AI-assisted tools", "All curricula"] },
   ];
   for (const p of plans) {
-    const [row] = await db.insert(s.subscriptionPlans).values({ code: p.code, name: p.name, description: p.description, status: p.status, billingInterval: p.interval, sortOrder: p.sort, display: { highlights: p.hi } }).onConflictDoNothing({ target: s.subscriptionPlans.code }).returning({ id: s.subscriptionPlans.id });
+    const [row] = await db.insert(s.subscriptionPlans).values({ code: p.code, name: p.name, description: p.description, status: p.status, billingInterval: p.interval, priceMinor: p.priceMinor, currency: p.priceMinor ? "USD" : "NGN", trialDays: p.trialDays, sortOrder: p.sort, display: { highlights: p.hi } }).onConflictDoNothing({ target: s.subscriptionPlans.code }).returning({ id: s.subscriptionPlans.id });
     if (!row) continue;
     for (const [k, v] of Object.entries(p.ent)) await db.insert(s.planEntitlements).values({ planId: row.id, featureKey: k, limitValue: v as number | null });
   }
-  // Keep the package order stable on databases seeded earlier, and retire the superseded draft 'standard' plan if nobody uses it
-  await db.update(s.subscriptionPlans).set({ sortOrder: 4 }).where(sql`${s.subscriptionPlans.code} = 'premium' and ${s.subscriptionPlans.sortOrder} = 2`);
-  await db.update(s.subscriptionPlans).set({ status: "retired" }).where(sql`${s.subscriptionPlans.code} = 'standard' and ${s.subscriptionPlans.status} = 'draft' and not exists (select 1 from organization_subscriptions os where os.plan_id = ${s.subscriptionPlans.id})`);
+  // Databases seeded earlier: bring still-untouched plans into line with the final package list, never overwriting a plan the Super Admin has edited.
+  for (const p of plans.filter((x) => x.priceMinor > 0)) {
+    await db.update(s.subscriptionPlans).set({ priceMinor: p.priceMinor, currency: "USD", status: "active", billingInterval: "yearly", sortOrder: p.sort, description: p.description, display: { highlights: p.hi } })
+      .where(sql`${s.subscriptionPlans.code} = ${p.code} and ${s.subscriptionPlans.priceMinor} = 0 and ${s.subscriptionPlans.status} = 'draft'`);
+  }
+  await db.update(s.subscriptionPlans).set({ trialDays: 30, description: plans[0].description, display: { highlights: plans[0].hi } }).where(sql`${s.subscriptionPlans.code} = 'free' and ${s.subscriptionPlans.trialDays} = 0`);
+  // The earlier three-tier draft 'standard' plan is superseded: remove it when nothing uses it, otherwise retire it.
+  await db.delete(s.subscriptionPlans).where(sql`${s.subscriptionPlans.code} = 'standard' and not exists (select 1 from organization_subscriptions os where os.plan_id = ${s.subscriptionPlans.id}) and not exists (select 1 from church_access_codes c where c.plan_id = ${s.subscriptionPlans.id}) and not exists (select 1 from payment_transactions t where t.plan_id = ${s.subscriptionPlans.id})`);
+  await db.update(s.subscriptionPlans).set({ status: "retired" }).where(sql`${s.subscriptionPlans.code} = 'standard'`);
   // Forum categories
   const forum = [
     ["general", "General discussion", "Open conversation among members of every church.", false], ["teaching-help", "Teaching help", "Ask and share ideas for teaching Sunday school.", false],
@@ -75,6 +81,22 @@ async function seedBaseline(db: DB) {
   // Website pages
   for (const p of PAGES) {
     await db.insert(s.sitePages).values({ slug: p.slug, title: p.title, kind: p.kind, sections: p.sections, seo: p.seo ?? {}, status: "published", publishedAt: new Date() }).onConflictDoNothing({ target: s.sitePages.slug });
+  }
+  // Databases seeded earlier: add the founder section to the home page once, and refresh two sentences about pricing so they match the final packages.
+  const [home] = await db.select().from(s.sitePages).where(eq(s.sitePages.slug, "home"));
+  if (home && !home.seo?.founderSeeded && !home.sections.some((x) => x.id === "founder")) {
+    const at = home.sections.findIndex((x) => x.id === "cats");
+    const next = [...home.sections]; next.splice(at >= 0 ? at : Math.max(home.sections.length - 1, 0), 0, FOUNDER_SECTION);
+    await db.update(s.sitePages).set({ sections: next, seo: { ...(home.seo ?? {}), founderSeeded: true } }).where(eq(s.sitePages.id, home.id));
+  }
+  const REWORD: [string, string][] = [
+    ["Registering a church is free. Choose a curriculum, set your opening Sunday and begin.", "Registering a church is free, and every church starts with 30 free days. Choose a curriculum, set your opening Sunday and begin."],
+    ["Registration is free and the free plan covers a limited number of learners and classes. Paid plans with more capacity and features are configured by the Academy and appear on the Pricing page when available.", "Every church starts free for 30 days, with no access code needed. After that you choose a yearly package (Silver, Bronze, Gold or Premium) or enter an access code from the Academy. The Pricing page shows what each package includes."],
+  ];
+  for (const pg of await db.select().from(s.sitePages)) {
+    let json = JSON.stringify(pg.sections), changed = false;
+    for (const [a, b] of REWORD) { const ja = JSON.stringify(a).slice(1, -1), jb = JSON.stringify(b).slice(1, -1); if (json.includes(ja)) { json = json.split(ja).join(jb); changed = true; } }
+    if (changed) await db.update(s.sitePages).set({ sections: JSON.parse(json) }).where(eq(s.sitePages.id, pg.id));
   }
   await loadDefaultLogos(db);
 }
