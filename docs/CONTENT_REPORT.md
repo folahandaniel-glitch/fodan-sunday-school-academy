@@ -5,11 +5,11 @@ Generated 2026-10-22 by `npm run content:report`.
 | Measure | Value |
 |---|---|
 | Curricula in catalogue | 50 |
-| Curricula with authored content | 7 |
-| Curricula passing every completeness rule | 7 |
-| Lesson units complete | 182 of 1300 |
-| Teaching words in complete lessons | 124,829 |
-| Questions in banks | 728 |
+| Curricula with authored content | 8 |
+| Curricula passing every completeness rule | 8 |
+| Lesson units complete | 208 of 1300 |
+| Teaching words in complete lessons | 142,865 |
+| Questions in banks | 832 |
 
 "Passes" means: 26 units present; every unit has a title, summary, theme, Scripture that resolves to real Bible text, memory verse, 3+ objectives, 3+ key terms, introduction, context, exegetical observations, 3+ teaching points, 4+ discussion questions with facilitator guidance, application, activity, take-home, prayer, teacher guidance and assessment note above minimum sizes; no placeholder text; no paragraph repeated across lessons; both blueprints present; and enough approved questions to draw a mid-session test (weeks 1-12) and a final examination (both halves). **It does not mean the content has been theologically reviewed.** Every curriculum waits for a human reviewer before it can be published to churches.
 
@@ -22,7 +22,7 @@ Generated 2026-10-22 by `npm run content:report`.
 | 5 | The Covenants of God | passes | 26/26 | 17,115 | 104 |
 | 6 | The Life and Ministry of Jesus Christ | passes | 26/26 | 17,467 | 104 |
 | 7 | The Death and Resurrection of Christ | passes | 26/26 | 18,098 | 104 |
-| 8 | The Person and Work of the Holy Spirit | not yet authored | 0/26 | 0 | 0 |
+| 8 | The Person and Work of the Holy Spirit | passes | 26/26 | 18,036 | 104 |
 | 9 | Salvation by Grace Through Faith | not yet authored | 0/26 | 0 | 0 |
 | 10 | The Second Coming of Jesus Christ | not yet authored | 0/26 | 0 | 0 |
 | 11 | The Power and Practice of Prayer | not yet authored | 0/26 | 0 | 0 |
