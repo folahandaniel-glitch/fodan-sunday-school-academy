@@ -5,11 +5,11 @@ Generated 2026-10-22 by `npm run content:report`.
 | Measure | Value |
 |---|---|
 | Curricula in catalogue | 50 |
-| Curricula with authored content | 8 |
-| Curricula passing every completeness rule | 8 |
-| Lesson units complete | 208 of 1300 |
-| Teaching words in complete lessons | 142,865 |
-| Questions in banks | 832 |
+| Curricula with authored content | 9 |
+| Curricula passing every completeness rule | 9 |
+| Lesson units complete | 234 of 1300 |
+| Teaching words in complete lessons | 160,608 |
+| Questions in banks | 936 |
 
 "Passes" means: 26 units present; every unit has a title, summary, theme, Scripture that resolves to real Bible text, memory verse, 3+ objectives, 3+ key terms, introduction, context, exegetical observations, 3+ teaching points, 4+ discussion questions with facilitator guidance, application, activity, take-home, prayer, teacher guidance and assessment note above minimum sizes; no placeholder text; no paragraph repeated across lessons; both blueprints present; and enough approved questions to draw a mid-session test (weeks 1-12) and a final examination (both halves). **It does not mean the content has been theologically reviewed.** Every curriculum waits for a human reviewer before it can be published to churches.
 
@@ -23,7 +23,7 @@ Generated 2026-10-22 by `npm run content:report`.
 | 6 | The Life and Ministry of Jesus Christ | passes | 26/26 | 17,467 | 104 |
 | 7 | The Death and Resurrection of Christ | passes | 26/26 | 18,098 | 104 |
 | 8 | The Person and Work of the Holy Spirit | passes | 26/26 | 18,036 | 104 |
-| 9 | Salvation by Grace Through Faith | not yet authored | 0/26 | 0 | 0 |
+| 9 | Salvation by Grace Through Faith | passes | 26/26 | 17,743 | 104 |
 | 10 | The Second Coming of Jesus Christ | not yet authored | 0/26 | 0 | 0 |
 | 11 | The Power and Practice of Prayer | not yet authored | 0/26 | 0 | 0 |
 | 12 | Understanding and Studying the Bible | not yet authored | 0/26 | 0 | 0 |
