@@ -41,7 +41,7 @@ async function seedBaseline(db: DB) {
     { code: "free", name: "Free", description: "Start with the essentials for 30 days, with no access code needed.", status: "active" as const, interval: "free" as const, sort: 0, priceMinor: 0, trialDays: 30,
       ent: { maxLearners: 100, maxClasses: 5, maxActiveSessions: 1, maxAdmins: 2, examsPerSession: 4, curriculumTier: 0, downloads: 1, certificates: 0, advancedReports: 0, customBranding: 0, aiAssist: 0, storageMb: 50 }, hi: ["Free for 30 days, no access code needed", "Up to 100 learners", "Up to 5 classes", "One active session", "Mid-session test and final examination", "Community forum"] },
     { code: "silver", name: "Silver", description: "Small and growing churches: more learners and classes, certificates and downloadable lesson materials.", status: "active" as const, interval: "yearly" as const, sort: 1, priceMinor: 1000, trialDays: 0,
-      ent: { maxLearners: 250, maxClasses: 15, maxActiveSessions: 1, maxAdmins: 3, examsPerSession: 8, curriculumTier: 1, downloads: 1, certificates: 1, advancedReports: 0, customBranding: 0, aiAssist: 0, storageMb: 250 }, hi: ["Up to 250 learners", "Up to 15 classes", "Certificates", "Downloadable lesson materials", "Standard-tier curricula"] },
+      ent: { maxLearners: 250, maxClasses: 15, maxActiveSessions: 1, maxAdmins: 3, examsPerSession: 8, curriculumTier: 1, downloads: 1, certificates: 1, advancedReports: 0, customBranding: 0, aiAssist: 0, storageMb: 250 }, hi: ["Up to 250 learners", "Up to 15 classes", "Certificates", "Downloadable lesson materials", "Core and standard curricula"] },
     { code: "bronze", name: "Bronze", description: "Established churches: two active sessions, more administrators and advanced reports.", status: "active" as const, interval: "yearly" as const, sort: 2, priceMinor: 1500, trialDays: 0,
       ent: { maxLearners: 600, maxClasses: 40, maxActiveSessions: 2, maxAdmins: 5, examsPerSession: 12, curriculumTier: 1, downloads: 1, certificates: 1, advancedReports: 1, customBranding: 0, aiAssist: 0, storageMb: 500 }, hi: ["Up to 600 learners", "Up to 40 classes", "Two active sessions", "Advanced reports", "Certificates"] },
     { code: "gold", name: "Gold", description: "Large churches: high limits, church branding and every curriculum tier.", status: "active" as const, interval: "yearly" as const, sort: 3, priceMinor: 2000, trialDays: 0,
@@ -54,12 +54,18 @@ async function seedBaseline(db: DB) {
     if (!row) continue;
     for (const [k, v] of Object.entries(p.ent)) await db.insert(s.planEntitlements).values({ planId: row.id, featureKey: k, limitValue: v as number | null });
   }
-  // Databases seeded earlier: bring still-untouched plans into line with the final package list, never overwriting a plan the Super Admin has edited.
-  for (const p of plans.filter((x) => x.priceMinor > 0)) {
-    await db.update(s.subscriptionPlans).set({ priceMinor: p.priceMinor, currency: "USD", status: "active", billingInterval: "yearly", sortOrder: p.sort, description: p.description, display: { highlights: p.hi } })
-      .where(sql`${s.subscriptionPlans.code} = ${p.code} and ${s.subscriptionPlans.priceMinor} = 0 and ${s.subscriptionPlans.status} = 'draft'`);
+  // One-time alignment of databases seeded earlier to the agreed package list (names, prices, status, 30-day Free start, features). Runs once, so later edits by the Super Admin are kept.
+  const [flag] = await db.select().from(s.settings).where(eq(s.settings.key, "seed.packages.v1"));
+  if (!flag) {
+    for (const p of plans) {
+      const vals = { name: p.name, description: p.description, status: p.status, billingInterval: p.interval, priceMinor: p.priceMinor, currency: p.priceMinor ? "USD" : "NGN", trialDays: p.trialDays, sortOrder: p.sort, display: { highlights: p.hi } };
+      const [row] = await db.update(s.subscriptionPlans).set(vals).where(eq(s.subscriptionPlans.code, p.code)).returning({ id: s.subscriptionPlans.id });
+      if (!row) continue;
+      await db.delete(s.planEntitlements).where(eq(s.planEntitlements.planId, row.id));
+      for (const [k, v] of Object.entries(p.ent)) await db.insert(s.planEntitlements).values({ planId: row.id, featureKey: k, limitValue: v as number | null });
+    }
+    await db.insert(s.settings).values({ key: "seed.packages.v1", value: { done: true } as never }).onConflictDoNothing();
   }
-  await db.update(s.subscriptionPlans).set({ trialDays: 30, description: plans[0].description, display: { highlights: plans[0].hi } }).where(sql`${s.subscriptionPlans.code} = 'free' and ${s.subscriptionPlans.trialDays} = 0`);
   // The earlier three-tier draft 'standard' plan is superseded: remove it when nothing uses it, otherwise retire it.
   await db.delete(s.subscriptionPlans).where(sql`${s.subscriptionPlans.code} = 'standard' and not exists (select 1 from organization_subscriptions os where os.plan_id = ${s.subscriptionPlans.id}) and not exists (select 1 from church_access_codes c where c.plan_id = ${s.subscriptionPlans.id}) and not exists (select 1 from payment_transactions t where t.plan_id = ${s.subscriptionPlans.id})`);
   await db.update(s.subscriptionPlans).set({ status: "retired" }).where(sql`${s.subscriptionPlans.code} = 'standard'`);
