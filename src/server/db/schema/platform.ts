@@ -32,7 +32,7 @@ export const organizationSubscriptions = pgTable("organization_subscriptions", {
   status: text("status").$type<"trialing" | "active" | "grace" | "expired" | "cancelled">().notNull().default("active"),
   startAt: tstz("start_at").defaultNow(), endAt: tstz("end_at"), trialEndAt: tstz("trial_end_at"),
   autoRenew: boolean("auto_renew").notNull().default(false),
-  source: text("source").$type<"default" | "payment" | "admin_grant" | "scholarship">().notNull().default("default"),
+  source: text("source").$type<"default" | "payment" | "admin_grant" | "scholarship" | "access_code">().notNull().default("default"),
   createdAt: created(), updatedAt: updated(),
 }, (t) => [index("os_org_idx").on(t.organizationId, t.status)]);
 
@@ -152,3 +152,31 @@ export const forumReports = pgTable("forum_reports", {
   reason: text("reason").notNull(), status: text("status").$type<"open" | "actioned" | "dismissed">().notNull().default("open"),
   handledBy: uuid("handled_by"), createdAt: created(),
 });
+
+/* ---------- Church access codes (issued by the Super Admin, redeemed at church registration) ---------- */
+export const churchAccessCodes = pgTable("church_access_codes", {
+  id: pk(),
+  code: text("code").notNull().unique(),
+  planId: uuid("plan_id").notNull().references(() => subscriptionPlans.id),
+  /** How long the plan runs from redemption. null = no end date. */
+  durationDays: integer("duration_days"),
+  /** How many churches may redeem this code (usually 1). */
+  maxUses: integer("max_uses").notNull().default(1),
+  usedCount: integer("used_count").notNull().default(0),
+  /** The code can no longer be redeemed after this moment. */
+  redeemBy: tstz("redeem_by"),
+  status: text("status").$type<"active" | "revoked">().notNull().default("active"),
+  /** Free-text label for the Super Admin, e.g. the church it was issued to. */
+  note: text("note").notNull().default(""),
+  createdBy: uuid("created_by").references(() => users.id),
+  createdAt: created(),
+}, (t) => [index("cac_plan_idx").on(t.planId), index("cac_status_idx").on(t.status)]);
+
+export const churchAccessCodeRedemptions = pgTable("church_access_code_redemptions", {
+  id: pk(),
+  codeId: uuid("code_id").notNull().references(() => churchAccessCodes.id, { onDelete: "cascade" }),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
+  redeemedBy: uuid("redeemed_by").references(() => users.id),
+  subscriptionId: uuid("subscription_id").references(() => organizationSubscriptions.id),
+  createdAt: created(),
+}, (t) => [unique("cacr_code_org_uq").on(t.codeId, t.organizationId)]);

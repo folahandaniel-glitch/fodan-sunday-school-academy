@@ -20,7 +20,7 @@ export default async function ChurchHome({ searchParams }: { searchParams: Promi
     <>
       <PageHeader title={ctx.orgName} sub={`${plan.plan.name} plan`} />
       {sp.welcome && <div className="mb-4"><Alert tone="ok"><strong>Your church is registered.</strong> Next steps: 1) invite teachers and learners (share your join code below) · 2) create classes · 3) choose a curriculum and a session.</Alert></div>}
-      {org.joinCode && ctx.role === "church_admin" && <div className="mb-4"><Alert tone="info">Members join by choosing your church when they register. Your instant-approval join code: <strong className="font-mono text-base">{org.joinCode}</strong></Alert></div>}
+      {org.joinCode && ctx.role === "church_admin" && <div className="mb-4"><Alert tone="info">Give this church member code to your members. When they register, choose your church and enter it: they are approved straight away. Your church member code: <strong className="font-mono text-base">{org.joinCode}</strong></Alert></div>}
       {o.pending > 0 && <div className="mb-4"><Alert tone="warn"><Link href="/church/members?status=pending" className="font-semibold">{o.pending} member(s) are waiting for your approval.</Link></Alert></div>}
       {updates.map((u) => <div key={u.id} className="mb-4"><Alert tone="info">A newer version of <strong>{u.title}</strong> is available. Your programme has not changed. <Link href={`/church/sessions/${u.id}`} className="font-semibold">Review what is new</Link></Alert></div>)}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

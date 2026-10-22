@@ -6,7 +6,7 @@ import { platformCan, type PlatformPerm } from "@/lib/permissions";
 
 const NEEDS: Record<string, PlatformPerm> = {
   "/admin/churches": "churches.view", "/admin/users": "users.manage", "/admin/curricula": "curriculum.write", "/admin/review": "curriculum.review", "/admin/completeness": "curriculum.write", "/admin/categories": "curriculum.write", "/admin/import": "curriculum.write",
-  "/admin/plans": "plans.manage", "/admin/payments": "payments.view", "/admin/site": "site.edit", "/admin/branding": "branding.edit", "/admin/forum": "forum.moderate", "/admin/settings": "settings.manage", "/admin/jobs": "jobs.view", "/admin/audit": "audit.view", "/admin/analytics": "reports.platform",
+  "/admin/plans": "plans.manage", "/admin/access-codes": "plans.manage", "/admin/payments": "payments.view", "/admin/site": "site.edit", "/admin/branding": "branding.edit", "/admin/forum": "forum.moderate", "/admin/settings": "settings.manage", "/admin/jobs": "jobs.view", "/admin/audit": "audit.view", "/admin/analytics": "reports.platform",
 };
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {

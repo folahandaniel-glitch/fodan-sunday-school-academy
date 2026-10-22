@@ -40,9 +40,13 @@ async function seedBaseline(db: DB) {
   const plans = [
     { code: "free", name: "Free", description: "For churches starting out: one active session, a limited number of learners and the essentials.", status: "active" as const, interval: "free" as const, sort: 0,
       ent: { maxLearners: 100, maxClasses: 5, maxActiveSessions: 1, maxAdmins: 2, examsPerSession: 4, curriculumTier: 0, downloads: 1, certificates: 0, advancedReports: 0, customBranding: 0, aiAssist: 0, storageMb: 50 }, hi: ["Up to 100 learners", "Up to 5 classes", "One active session", "Mid-session test and final examination", "Community forum"] },
-    { code: "standard", name: "Standard", description: "More learners and classes, certificates and downloadable lesson materials.", status: "draft" as const, interval: "yearly" as const, sort: 1,
-      ent: { maxLearners: 500, maxClasses: 25, maxActiveSessions: 2, maxAdmins: 5, examsPerSession: 12, curriculumTier: 1, downloads: 1, certificates: 1, advancedReports: 0, customBranding: 0, aiAssist: 0, storageMb: 500 }, hi: ["Up to 500 learners", "Up to 25 classes", "Certificates", "Standard-tier curricula"] },
-    { code: "premium", name: "Premium", description: "Large churches and networks: very high limits, advanced reports and church branding.", status: "draft" as const, interval: "yearly" as const, sort: 2,
+    { code: "silver", name: "Silver", description: "Small and growing churches: more learners and classes, certificates and downloadable lesson materials.", status: "draft" as const, interval: "yearly" as const, sort: 1,
+      ent: { maxLearners: 250, maxClasses: 15, maxActiveSessions: 1, maxAdmins: 3, examsPerSession: 8, curriculumTier: 1, downloads: 1, certificates: 1, advancedReports: 0, customBranding: 0, aiAssist: 0, storageMb: 250 }, hi: ["Up to 250 learners", "Up to 15 classes", "Certificates", "Downloadable lesson materials", "Standard-tier curricula"] },
+    { code: "bronze", name: "Bronze", description: "Established churches: two active sessions, more administrators and advanced reports.", status: "draft" as const, interval: "yearly" as const, sort: 2,
+      ent: { maxLearners: 600, maxClasses: 40, maxActiveSessions: 2, maxAdmins: 5, examsPerSession: 12, curriculumTier: 1, downloads: 1, certificates: 1, advancedReports: 1, customBranding: 0, aiAssist: 0, storageMb: 500 }, hi: ["Up to 600 learners", "Up to 40 classes", "Two active sessions", "Advanced reports", "Certificates"] },
+    { code: "gold", name: "Gold", description: "Large churches: high limits, church branding and every curriculum tier.", status: "draft" as const, interval: "yearly" as const, sort: 3,
+      ent: { maxLearners: 1500, maxClasses: 100, maxActiveSessions: 4, maxAdmins: 10, examsPerSession: 24, curriculumTier: 2, downloads: 1, certificates: 1, advancedReports: 1, customBranding: 1, aiAssist: 0, storageMb: 2000 }, hi: ["Up to 1,500 learners", "Up to 100 classes", "Four active sessions", "Church branding", "All curricula"] },
+    { code: "premium", name: "Premium", description: "Large churches and networks: no limits, advanced reports, church branding and AI-assisted tools.", status: "draft" as const, interval: "yearly" as const, sort: 4,
       ent: { maxLearners: null, maxClasses: null, maxActiveSessions: null, maxAdmins: null, examsPerSession: null, curriculumTier: 2, downloads: 1, certificates: 1, advancedReports: 1, customBranding: 1, aiAssist: 1, storageMb: 5000 }, hi: ["Unlimited learners and classes", "Advanced reports", "Church branding", "All curricula"] },
   ];
   for (const p of plans) {
@@ -50,6 +54,9 @@ async function seedBaseline(db: DB) {
     if (!row) continue;
     for (const [k, v] of Object.entries(p.ent)) await db.insert(s.planEntitlements).values({ planId: row.id, featureKey: k, limitValue: v as number | null });
   }
+  // Keep the package order stable on databases seeded earlier, and retire the superseded draft 'standard' plan if nobody uses it
+  await db.update(s.subscriptionPlans).set({ sortOrder: 4 }).where(sql`${s.subscriptionPlans.code} = 'premium' and ${s.subscriptionPlans.sortOrder} = 2`);
+  await db.update(s.subscriptionPlans).set({ status: "retired" }).where(sql`${s.subscriptionPlans.code} = 'standard' and ${s.subscriptionPlans.status} = 'draft' and not exists (select 1 from organization_subscriptions os where os.plan_id = ${s.subscriptionPlans.id})`);
   // Forum categories
   const forum = [
     ["general", "General discussion", "Open conversation among members of every church.", false], ["teaching-help", "Teaching help", "Ask and share ideas for teaching Sunday school.", false],

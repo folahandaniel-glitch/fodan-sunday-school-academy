@@ -5,6 +5,7 @@ import { requirePlatform, actorOf } from "@/server/guards";
 import * as cur from "@/server/services/curriculum";
 import * as admin from "@/server/services/admin";
 import * as billing from "@/server/services/billing";
+import * as accessCodes from "@/server/services/access-codes";
 import * as cms from "@/server/services/cms";
 import { getSetting } from "@/server/settings";
 import { toMinor } from "@/lib/money";
@@ -249,7 +250,7 @@ export async function saveSettingAction(_: FormState | null, fd: FormData): Prom
     const key = s(fd, "key");
     if (key === "features") {
       const cur = await getSetting("features");
-      await cms.saveSettingGroup(a, "features", { ...cur, memberRegistrationOpen: b(fd, "memberRegistrationOpen"), churchRegistrationOpen: b(fd, "churchRegistrationOpen"), requireChurchApproval: b(fd, "requireChurchApproval"), requireEmailVerification: b(fd, "requireEmailVerification"), allowTypedChurchNames: b(fd, "allowTypedChurchNames"), forumEnabled: b(fd, "forumEnabled"), forumRequiresVerifiedEmail: b(fd, "forumRequiresVerifiedEmail"), requireHumanReview: b(fd, "requireHumanReview"), maxFailedLogins: n(fd, "maxFailedLogins", 6), lockMinutes: n(fd, "lockMinutes", 15), graceDays: n(fd, "graceDays", 7), defaultCurrency: s(fd, "defaultCurrency") || "NGN" });
+      await cms.saveSettingGroup(a, "features", { ...cur, memberRegistrationOpen: b(fd, "memberRegistrationOpen"), churchRegistrationOpen: b(fd, "churchRegistrationOpen"), requireChurchAccessCode: b(fd, "requireChurchAccessCode"), requireChurchApproval: b(fd, "requireChurchApproval"), requireEmailVerification: b(fd, "requireEmailVerification"), allowTypedChurchNames: b(fd, "allowTypedChurchNames"), forumEnabled: b(fd, "forumEnabled"), forumRequiresVerifiedEmail: b(fd, "forumRequiresVerifiedEmail"), requireHumanReview: b(fd, "requireHumanReview"), maxFailedLogins: n(fd, "maxFailedLogins", 6), lockMinutes: n(fd, "lockMinutes", 15), graceDays: n(fd, "graceDays", 7), defaultCurrency: s(fd, "defaultCurrency") || "NGN" });
     } else if (key === "contact") await cms.saveSettingGroup(a, "contact", { email: s(fd, "email"), phone: s(fd, "phone"), whatsapp: s(fd, "whatsapp"), address: s(fd, "address"), hours: s(fd, "hours"), website: s(fd, "website") });
     else if (key === "social") await cms.saveSettingGroup(a, "social", { facebook: s(fd, "facebook"), youtube: s(fd, "youtube"), instagram: s(fd, "instagram"), x: s(fd, "x"), tiktok: s(fd, "tiktok"), whatsapp: s(fd, "whatsapp"), telegram: s(fd, "telegram") });
     else if (key === "nav") await cms.saveSettingGroup(a, "nav", lines(fd, "items").map((l) => { const [label, href] = l.split("|").map((x) => x.trim()); return { label, href }; }).filter((x) => x.label && x.href?.startsWith("/")));
@@ -272,3 +273,23 @@ export async function retryJobAction(_: FormState | null, fd: FormData): Promise
   return run(async () => { const { a } = await actor("settings.manage"); await admin.retryJob(a, s(fd, "id")); });
 }
 export async function goHome() { redirect("/admin"); }
+
+/* ---------- church access codes ---------- */
+export async function generateAccessCodesAction(_: FormState | null, fd: FormData): Promise<FormState> {
+  return run(async () => {
+    const { a } = await actor("plans.manage");
+    const days = s(fd, "durationDays");
+    const by = s(fd, "redeemBy");
+    const r = await accessCodes.generateAccessCodes(a, {
+      planId: s(fd, "planId"), quantity: n(fd, "quantity") || 1, durationDays: days === "" ? null : Number(days), maxUses: n(fd, "maxUses") || 1,
+      redeemBy: by ? new Date(by + "T23:59:59") : null, note: s(fd, "note"),
+    });
+    if (!r.ok) return fail(r.error);
+    return { redirect: "/admin/access-codes?new=" + encodeURIComponent(r.codes.join(",")) };
+  });
+}
+export async function revokeAccessCodeAction(fd: FormData) {
+  const { a } = await actor("plans.manage");
+  await accessCodes.revokeAccessCode(a, s(fd, "id"));
+  redirect("/admin/access-codes");
+}

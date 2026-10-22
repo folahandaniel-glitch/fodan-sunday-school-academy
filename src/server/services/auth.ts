@@ -12,6 +12,7 @@ import { emailAdminsOf, notify, queueEmail } from "./notify";
 import { isEmail, normEmail, normName, slugify } from "@/lib/text";
 import { platformCan } from "@/lib/permissions";
 import { appUrl } from "../url";
+import { checkAccessCode, redeemAccessCodeTx } from "./access-codes";
 
 export type Result<T = object> = ({ ok: true } & T) | { ok: false; error: string; field?: string };
 const fail = (error: string, field?: string): { ok: false; error: string; field?: string } => ({ ok: false, error, field });
@@ -37,6 +38,7 @@ export const churchRegistrationSchema = z.object({
   currency: z.string().trim().length(3).default("NGN"),
   acceptTerms: z.literal(true, { error: "You must accept the terms to continue." }),
   claimOrgId: z.string().uuid().optional(),
+  accessCode: z.string().trim().max(40).optional().default(""),
 });
 export type ChurchRegistration = z.input<typeof churchRegistrationSchema>;
 
@@ -77,7 +79,7 @@ async function issueEmailVerification(userId: string, to: string, db?: DB | Tx) 
 }
 
 /** Church leader registration. Creates the church and its first administrator in ONE transaction. */
-export async function registerChurch(input: ChurchRegistration, actor: Actor | null = null): Promise<Result<{ userId: string; orgId: string; status: string }>> {
+export async function registerChurch(input: ChurchRegistration, actor: Actor | null = null): Promise<Result<{ userId: string; orgId: string; status: string; joinCode: string }>> {
   const f = await getSetting("features");
   if (!f.churchRegistrationOpen) return fail("Church registration is currently closed.");
   const p = churchRegistrationSchema.safeParse(input);
@@ -90,6 +92,8 @@ export async function registerChurch(input: ChurchRegistration, actor: Actor | n
   const db = await getDb();
   const [taken] = await db.select({ id: schema.users.id }).from(schema.users).where(eq(schema.users.normalizedEmail, em));
   if (taken) return fail("An account with this email already exists. Sign in instead.", "adminEmail");
+  if (f.requireChurchAccessCode && !d.accessCode) return fail("Enter the access code the Academy gave your church.", "accessCode");
+  if (d.accessCode) { const ck = await checkAccessCode(d.accessCode); if (!ck.ok) return ck; }
   const hash = await hashPassword(d.password);
   const status = f.requireChurchApproval ? "pending" : "active";
   try {
@@ -111,13 +115,18 @@ export async function registerChurch(input: ChurchRegistration, actor: Actor | n
       if (!o2.jc) await tx.update(schema.organizations).set({ joinCode: friendlyCode() }).where(eq(schema.organizations.id, orgId));
       const plan = await freePlanId(tx);
       if (plan) await tx.insert(schema.organizationSubscriptions).values({ organizationId: orgId, planId: plan, status: "active", source: "default" });
+      if (d.accessCode) await redeemAccessCodeTx(tx, d.accessCode, orgId, user.id);
       await audit(actor, d.claimOrgId ? "church.claimed" : "church.registered", { type: "organization", id: orgId }, { adminUserId: user.id }, { orgId, db: tx });
-      return { userId: user.id, orgId };
+      const [jc] = await tx.select({ jc: schema.organizations.joinCode }).from(schema.organizations).where(eq(schema.organizations.id, orgId));
+      return { userId: user.id, orgId, joinCode: jc?.jc ?? "" };
     });
     if (f.requireEmailVerification) await issueEmailVerification(out.userId, d.adminEmail.trim());
-    await queueEmail(d.adminEmail.trim(), "Your church is registered", `Your church "${d.churchName}" is registered on Fodan Sunday School Academy${status === "pending" ? " and is waiting for approval" : ""}. Sign in to choose a curriculum and invite your teachers.`, `welcome:${out.userId}`);
+    await queueEmail(d.adminEmail.trim(), "Your church is registered", `Your church "${d.churchName}" is registered on Fodan Sunday School Academy${status === "pending" ? " and is waiting for approval" : ""}. Sign in to choose a curriculum and invite your teachers.
+
+Your church member code is ${out.joinCode}. Give it to your members: when they register and choose your church, entering this code approves them straight away. Keep it within your church; you can see it any time on your church dashboard.`, `welcome:${out.userId}`);
     return { ok: true, ...out, status };
   } catch (e) {
+    if ((e as Error).message === "BAD_ACCESS_CODE") return fail("That access code could not be used. It may have just been used or withdrawn. Please contact the Academy.", "accessCode");
     if ((e as Error).message === "CLAIM_UNAVAILABLE") return fail("That church listing is no longer available to claim. Register it as a new church or search again.");
     throw e;
   }
@@ -184,7 +193,7 @@ export async function registerMember(input: MemberRegistration, actor: Actor | n
   } catch (e) {
     const m = (e as Error).message;
     if (m === "CHURCH_UNAVAILABLE") return fail("That church is not available for registration right now.", "church");
-    if (m === "BAD_CODE") return fail("That join code is not correct for this church.", "joinCode");
+    if (m === "BAD_CODE") return fail("That church member code is not correct. Ask your church for the right code, or leave it blank and wait for approval.", "joinCode");
     if (m.startsWith("DUPLICATE_CHURCH:")) return fail(`“${m.slice(17)}” is already listed. Please search for it and select it instead of typing it again.`, "church");
     throw e;
   }

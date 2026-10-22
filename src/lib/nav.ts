@@ -57,6 +57,7 @@ export const ADMIN_NAV: NavItem[] = [
   { label: "Categories", href: "/admin/categories", icon: "tag", group: "Curriculum" },
   { label: "Import & Export", href: "/admin/import", icon: "upload", group: "Curriculum" },
   { label: "Subscription Plans", href: "/admin/plans", icon: "card", group: "Commerce" },
+  { label: "Church Access Codes", href: "/admin/access-codes", icon: "tag", group: "Commerce" },
   { label: "Payments & Invoices", href: "/admin/payments", icon: "card", group: "Commerce" },
   { label: "Website Content", href: "/admin/site", icon: "globe", group: "Website" },
   { label: "Branding & Logos", href: "/admin/branding", icon: "palette", group: "Website" },

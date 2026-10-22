@@ -50,7 +50,7 @@ export async function registerChurchAction(_: FormState | null, fd: FormData): P
     const r = await registerChurch({
       churchName: s(fd, "churchName"), type: s(fd, "type") || "Church", denomination: s(fd, "denomination"), country: s(fd, "country") || "Nigeria", state: s(fd, "state"), city: s(fd, "city"), address: s(fd, "address"),
       contactEmail: s(fd, "contactEmail"), phone: s(fd, "phone"), adminName: s(fd, "adminName"), adminEmail: s(fd, "adminEmail"), password: String(fd.get("password") ?? ""),
-      language: s(fd, "language") || "en", timezone: s(fd, "timezone") || "Africa/Lagos", currency: s(fd, "currency") || "NGN", acceptTerms: b(fd, "acceptTerms") as true, claimOrgId: s(fd, "claimOrgId") || undefined,
+      language: s(fd, "language") || "en", timezone: s(fd, "timezone") || "Africa/Lagos", currency: s(fd, "currency") || "NGN", acceptTerms: b(fd, "acceptTerms") as true, claimOrgId: s(fd, "claimOrgId") || undefined, accessCode: s(fd, "accessCode"),
     }, { id: null, ip: ctx.ip });
     if (!r.ok) return { ok: false, error: r.error } as FormState;
     await startSession(r.userId, false, false, ctx.ip, ctx.userAgent);

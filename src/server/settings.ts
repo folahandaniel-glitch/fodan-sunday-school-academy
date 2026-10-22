@@ -30,7 +30,7 @@ export const DEFAULTS = {
   },
   features: {
     memberRegistrationOpen: true, churchRegistrationOpen: true, requireChurchApproval: false, requireEmailVerification: false,
-    allowTypedChurchNames: true, forumEnabled: true, forumRequiresVerifiedEmail: false,
+    allowTypedChurchNames: true, requireChurchAccessCode: false, forumEnabled: true, forumRequiresVerifiedEmail: false,
     requireHumanReview: true, maxFailedLogins: 6, lockMinutes: 15, defaultCurrency: "NGN", graceDays: 7,
     maxUploadMb: 5, aiAssistance: false,
   },

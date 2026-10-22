@@ -42,6 +42,9 @@ export default async function RegisterChurch({ searchParams }: { searchParams: P
           <div><label className="label" htmlFor="address">Address (optional)</label><input id="address" name="address" className="input" /></div>
           <div><label className="label" htmlFor="contactEmail">Official church email</label><input id="contactEmail" name="contactEmail" type="email" className="input" required /></div>
         </fieldset>
+        <fieldset className="space-y-3"><legend className="font-display text-lg text-navy">Academy access code</legend>
+          <div><label className="label" htmlFor="accessCode">Access code {f.requireChurchAccessCode ? "" : "(optional)"}</label><input id="accessCode" name="accessCode" className="input font-mono uppercase" autoComplete="off" required={f.requireChurchAccessCode} placeholder="e.g. GOLD-K7QM-4TXP" /><p className="hint">{f.requireChurchAccessCode ? "Enter the code the Academy gave your church. It sets your package." : "If the Academy gave your church a code, enter it to start on that package. Without one you begin on the Free package."} After you register you will receive your own church member code to give your members.</p></div>
+        </fieldset>
         <fieldset className="space-y-3"><legend className="font-display text-lg text-navy">Preferences</legend>
           <div className="grid gap-3 sm:grid-cols-3">
             <div><label className="label" htmlFor="language">Language</label><select id="language" name="language" className="input"><option value="en">English</option></select></div>

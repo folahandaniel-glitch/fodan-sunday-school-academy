@@ -43,6 +43,13 @@
       "when": 1792443020699,
       "tag": "0005_version_immutability",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792671650752,
+      "tag": "0006_access_codes",
+      "breakpoints": true
     }
   ]
 }
