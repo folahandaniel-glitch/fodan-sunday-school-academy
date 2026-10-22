@@ -6,6 +6,7 @@ import { CONTENT } from "@/content/registry";
 import { buildBlueprints, buildLessons, type BuiltLesson } from "@/content/build";
 import { PAGES, FOUNDER_SECTION } from "./site";
 import { sha256 } from "../crypto";
+import { lessonsHashOf } from "../fingerprint";
 import { validateCurriculum } from "@/lib/completeness";
 import { loadDefaultLogos } from "./logos";
 
@@ -132,6 +133,11 @@ export async function seedContent(db: DB, only?: number[]): Promise<SeedReport> 
     const seeded = versions.filter((v) => v.provenance === "seed").sort((a, b) => b.versionNumber - a.versionNumber);
     const latest = seeded[0];
     if (latest?.contentHash === hash) { report.skipped.push(entry.n); continue; }
+    // Approval replaces the stored fingerprint, so also compare the lesson text itself; otherwise every deploy re-adds an unchanged approved curriculum as a new version.
+    if (latest) {
+      const rows = await db.select().from(s.curriculumLessons).where(eq(s.curriculumLessons.versionId, latest.id));
+      if (rows.length === lessons.length && lessonsHashOf(rows.sort((a, b) => a.weekNumber - b.weekNumber)) === lessonsHashOf(lessons)) { report.skipped.push(entry.n); continue; }
+    }
     if (latest && (latest.status === "draft" || latest.status === "in_review" || latest.status === "rejected")) {
       await db.transaction(async (tx) => {
         await tx.delete(s.questionBanks).where(eq(s.questionBanks.versionId, latest.id));

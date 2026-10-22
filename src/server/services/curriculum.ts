@@ -4,6 +4,7 @@ import { getDb, schema, type DB, type Tx, qid } from "../db";
 import { AccessError, NotFoundError } from "../org";
 import { audit, type Actor } from "../audit";
 import { sha256 } from "../crypto";
+import { stableStringify } from "../fingerprint";
 import { getSetting } from "../settings";
 import { getPassages } from "../bible-data";
 import { validateCurriculum, validateLesson, type CurriculumReport, type LessonLike } from "@/lib/completeness";
@@ -93,8 +94,25 @@ export async function validateVersion(versionId: string, opts: { store?: boolean
   return { ...report, ok, scriptureProblems };
 }
 
-export function contentHashOf(b: Awaited<ReturnType<typeof loadBundle>>) {
-  return sha256(JSON.stringify([b.lessons.map((l) => [l.weekNumber, l.title, l.summary, l.content, l.objectives]), b.blueprints.map((x) => [x.kind, x.config])]));
+type Bundle = Awaited<ReturnType<typeof loadBundle>>;
+const lessonPart = (b: Bundle) => b.lessons.map((l) => [l.weekNumber, l.title, l.summary, l.content, l.objectives]);
+
+/** Order-independent fingerprint of a version's lessons and blueprints. Blueprints are sorted because the database returns them in no fixed order. */
+export function contentHashOf(b: Bundle) {
+  const bps = b.blueprints.map((x) => [x.kind, x.config]).sort((a, c) => (stableStringify(a) < stableStringify(c) ? -1 : 1));
+  return sha256(stableStringify([lessonPart(b), bps]));
+}
+
+/** Fingerprints made before the canonical form existed (blueprints in whatever order the database returned them). Used only to verify old approvals. */
+function legacyHashesOf(b: Bundle) {
+  const perms = (a: unknown[][]): unknown[][][] => (a.length <= 1 ? [a] : a.flatMap((x, i) => perms([...a.slice(0, i), ...a.slice(i + 1)]).map((r) => [x, ...r])));
+  return perms(b.blueprints.map((x) => [x.kind, x.config])).map((p) => sha256(JSON.stringify([lessonPart(b), p])));
+}
+
+/** True when the stored review fingerprint still describes this content (current or legacy form). */
+export function contentMatchesRecord(stored: string | null, b: Bundle) {
+  if (!stored) return true;
+  return stored === contentHashOf(b) || legacyHashesOf(b).includes(stored);
 }
 
 /* ===================== Admin: listing ===================== */
@@ -293,7 +311,9 @@ export async function publishVersion(actor: Actor, versionId: string) {
   if (!v) throw new NotFoundError("Version not found.");
   if (v.status !== "approved") throw new AccessError("Only an approved version can be published.");
   const bundle = await loadBundle(versionId);
-  if (v.contentHash && v.contentHash !== contentHashOf(bundle)) throw new AccessError("The approved content no longer matches its review record. Create a new version.");
+  if (!contentMatchesRecord(v.contentHash, bundle)) throw new AccessError("The approved content no longer matches its review record. Create a new version.");
+  const canonical = contentHashOf(bundle);
+  if (v.contentHash !== canonical) await db.update(schema.curriculumVersions).set({ contentHash: canonical }).where(eq(schema.curriculumVersions.id, versionId));
   const prev = await db.transaction(async (tx) => {
     const [c] = await tx.select().from(schema.curricula).where(eq(schema.curricula.id, v.curriculumId)).for("update");
     if (c.currentVersionId && c.currentVersionId !== versionId) await tx.update(schema.curriculumVersions).set({ status: "superseded" }).where(eq(schema.curriculumVersions.id, c.currentVersionId));
@@ -457,10 +477,16 @@ export async function approveAllValid(actor: Actor) {
 /** Bulk publish: publish every approved version so churches can select it. Earlier published versions are superseded safely by publishVersion. */
 export async function publishAllApproved(actor: Actor) {
   const db = await getDb();
-  const rows = await db.select({ v: schema.curriculumVersions, title: schema.curricula.title }).from(schema.curriculumVersions).innerJoin(schema.curricula, eq(schema.curricula.id, schema.curriculumVersions.curriculumId)).where(eq(schema.curriculumVersions.status, "approved")).orderBy(schema.curricula.catalogNumber);
+  const rows = await db.select({ v: schema.curriculumVersions, title: schema.curricula.title }).from(schema.curriculumVersions).innerJoin(schema.curricula, eq(schema.curricula.id, schema.curriculumVersions.curriculumId)).where(eq(schema.curriculumVersions.status, "approved")).orderBy(schema.curricula.catalogNumber, desc(schema.curriculumVersions.versionNumber));
   const done: string[] = [], skipped: { title: string; reason: string }[] = [];
+  const handled = new Set<string>();
   for (const { v, title } of rows) {
-    try { await publishVersion(actor, v.id); done.push(title); } catch (e) { skipped.push({ title, reason: (e as Error).message }); }
+    if (handled.has(v.curriculumId)) {
+      // An older approved copy of a curriculum whose newest approved version was just handled: retire it so it stops cluttering the queue.
+      await db.update(schema.curriculumVersions).set({ status: "superseded" }).where(and(eq(schema.curriculumVersions.id, v.id), eq(schema.curriculumVersions.status, "approved")));
+      continue;
+    }
+    try { await publishVersion(actor, v.id); handled.add(v.curriculumId); done.push(title); } catch (e) { skipped.push({ title, reason: (e as Error).message }); }
   }
   return { done, skipped };
 }
