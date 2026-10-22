@@ -5,11 +5,11 @@ Generated 2026-10-22 by `npm run content:report`.
 | Measure | Value |
 |---|---|
 | Curricula in catalogue | 50 |
-| Curricula with authored content | 19 |
-| Curricula passing every completeness rule | 19 |
-| Lesson units complete | 494 of 1300 |
-| Teaching words in complete lessons | 338,047 |
-| Questions in banks | 1,976 |
+| Curricula with authored content | 20 |
+| Curricula passing every completeness rule | 20 |
+| Lesson units complete | 520 of 1300 |
+| Teaching words in complete lessons | 355,238 |
+| Questions in banks | 2,080 |
 
 "Passes" means: 26 units present; every unit has a title, summary, theme, Scripture that resolves to real Bible text, memory verse, 3+ objectives, 3+ key terms, introduction, context, exegetical observations, 3+ teaching points, 4+ discussion questions with facilitator guidance, application, activity, take-home, prayer, teacher guidance and assessment note above minimum sizes; no placeholder text; no paragraph repeated across lessons; both blueprints present; and enough approved questions to draw a mid-session test (weeks 1-12) and a final examination (both halves). **It does not mean the content has been theologically reviewed.** Every curriculum waits for a human reviewer before it can be published to churches.
 
@@ -34,7 +34,7 @@ Generated 2026-10-22 by `npm run content:report`.
 | 17 | Holiness and Sanctification | passes | 26/26 | 17,775 | 104 |
 | 18 | Spiritual Warfare and the Armour of God | passes | 26/26 | 17,616 | 104 |
 | 19 | Hearing and Discerning the Voice of God | passes | 26/26 | 17,441 | 104 |
-| 20 | Worship, Praise and Thanksgiving | not yet authored | 0/26 | 0 | 0 |
+| 20 | Worship, Praise and Thanksgiving | passes | 26/26 | 17,191 | 104 |
 | 21 | The Christian Family and God's Design for Marriage | not yet authored | 0/26 | 0 | 0 |
 | 22 | Raising Children in the Fear of the Lord | not yet authored | 0/26 | 0 | 0 |
 | 23 | Christian Parenting in the Digital Age | not yet authored | 0/26 | 0 | 0 |
