@@ -5,11 +5,11 @@ Generated 2026-10-22 by `npm run content:report`.
 | Measure | Value |
 |---|---|
 | Curricula in catalogue | 50 |
-| Curricula with authored content | 21 |
-| Curricula passing every completeness rule | 21 |
-| Lesson units complete | 546 of 1300 |
-| Teaching words in complete lessons | 372,745 |
-| Questions in banks | 2,184 |
+| Curricula with authored content | 22 |
+| Curricula passing every completeness rule | 22 |
+| Lesson units complete | 572 of 1300 |
+| Teaching words in complete lessons | 389,827 |
+| Questions in banks | 2,288 |
 
 "Passes" means: 26 units present; every unit has a title, summary, theme, Scripture that resolves to real Bible text, memory verse, 3+ objectives, 3+ key terms, introduction, context, exegetical observations, 3+ teaching points, 4+ discussion questions with facilitator guidance, application, activity, take-home, prayer, teacher guidance and assessment note above minimum sizes; no placeholder text; no paragraph repeated across lessons; both blueprints present; and enough approved questions to draw a mid-session test (weeks 1-12) and a final examination (both halves). **It does not mean the content has been theologically reviewed.** Every curriculum waits for a human reviewer before it can be published to churches.
 
@@ -36,7 +36,7 @@ Generated 2026-10-22 by `npm run content:report`.
 | 19 | Hearing and Discerning the Voice of God | passes | 26/26 | 17,441 | 104 |
 | 20 | Worship, Praise and Thanksgiving | passes | 26/26 | 17,191 | 104 |
 | 21 | The Christian Family and God's Design for Marriage | passes | 26/26 | 17,507 | 104 |
-| 22 | Raising Children in the Fear of the Lord | not yet authored | 0/26 | 0 | 0 |
+| 22 | Raising Children in the Fear of the Lord | passes | 26/26 | 17,082 | 104 |
 | 23 | Christian Parenting in the Digital Age | not yet authored | 0/26 | 0 | 0 |
 | 24 | Forgiveness, Reconciliation and Healing Relationships | not yet authored | 0/26 | 0 | 0 |
 | 25 | Integrity, Honesty and Godly Character | not yet authored | 0/26 | 0 | 0 |
