@@ -19,7 +19,7 @@ export async function ExamsIndex({ ctx, base }: { ctx: OrgCtx; base: string }) {
   return (
     <>
       <PageHeader title="Assessments" sub="Mid-session test (default week 13), final examination (default week 25) and revision quizzes. Generate a draft from the approved question bank, review it, then publish." />
-      {rows.length === 0 ? <Empty title="No tests or examinations yet">Choose a programme below to draft the mid-session test or final examination.</Empty> : (
+      {rows.length === 0 ? <Empty title="No tests or examinations yet" action={<div className="flex flex-wrap justify-center gap-2"><Link className="btn btn-primary" href={`${base}/sessions`}>Open a programme</Link><Link className="btn btn-light" href={`${base}/library`}>Choose a curriculum</Link></div>}>Tests and examinations belong to a programme. Activate a programme first, then open it to draft the mid-session test (week 13) or the final examination (week 25) from the approved question bank.</Empty> : (
         <Table caption="Examinations"><thead><tr><th>Title</th><th>Programme</th><th>Type</th><th>Marks</th><th>Attempts</th><th>To mark</th><th>Status</th></tr></thead><tbody>
           {rows.map((r) => (<tr key={r.e.id}><td><Link className="font-semibold" href={`${base}/exams/${r.e.id}`}>{r.e.title}</Link></td><td>{r.programme}</td><td>{r.e.kind}</td><td>{r.e.totalMarks}</td><td>{r.attempts}</td><td>{r.pending ? <Badge tone="warn">{r.pending}</Badge> : "–"}</td><td><StatusBadge status={r.e.status} /></td></tr>))}
         </tbody></Table>
@@ -107,7 +107,7 @@ export async function GradingQueue({ ctx, base }: { ctx: OrgCtx; base: string })
   return (
     <>
       <PageHeader title="Grading queue" sub="Written answers waiting for a teacher. Short answers show the key points to look for; a doctrinally careful answer that differs from the model answer is not wrong." />
-      {rows.length === 0 ? <Empty title="Nothing waiting to be marked" /> : (
+      {rows.length === 0 ? <Empty title="Nothing waiting to be marked" action={<Link className="btn btn-light" href={`${base}/exams`}>Go to Assessments</Link>}>Written answers appear here after learners submit an examination that includes short-answer or essay questions. Objective questions are marked automatically.</Empty> : (
         <Table caption="Attempts to mark"><thead><tr><th>Learner</th><th>Examination</th><th>Submitted</th><th>Answers to mark</th><th /></tr></thead><tbody>
           {rows.map((r) => (<tr key={r.attemptId}><td className="font-semibold">{r.learner}</td><td>{r.exam}</td><td>{fmtDateTime(r.submittedAt, ctx.timezone)}</td><td>{r.pending}</td><td><Link className="btn btn-primary btn-sm" href={`${base}/grading/${r.attemptId}`}>Mark</Link></td></tr>))}
         </tbody></Table>

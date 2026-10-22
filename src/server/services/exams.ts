@@ -1,6 +1,6 @@
 import "server-only";
 import { and, asc, desc, eq, inArray, isNull, sql } from "drizzle-orm";
-import { getDb, schema, type DB, type Tx } from "../db";
+import { getDb, schema, type DB, type Tx, qid } from "../db";
 import { AccessError, NotFoundError, assertCan, assertClassAccess, teacherClassIds, can, type OrgCtx } from "../org";
 import { audit } from "../audit";
 import { getSetting } from "../settings";
@@ -181,8 +181,8 @@ export async function listExams(ctx: OrgCtx) {
   const db = await getDb();
   assertCan(ctx, "classes.view");
   return db.select({ e: schema.examinations, programme: schema.curricula.title,
-    attempts: sql<number>`(select count(*)::int from examination_attempts a where a.exam_id = ${schema.examinations.id})`,
-    pending: sql<number>`(select count(*)::int from examination_attempts a where a.exam_id = ${schema.examinations.id} and a.grading_status = 'pending_review')` })
+    attempts: sql<number>`(select count(*)::int from examination_attempts a where a.exam_id = ${qid(schema.examinations)})`,
+    pending: sql<number>`(select count(*)::int from examination_attempts a where a.exam_id = ${qid(schema.examinations)} and a.grading_status = 'pending_review')` })
     .from(schema.examinations).innerJoin(schema.curriculumAssignments, eq(schema.curriculumAssignments.id, schema.examinations.assignmentId)).innerJoin(schema.curricula, eq(schema.curricula.id, schema.curriculumAssignments.curriculumId))
     .where(eq(schema.examinations.organizationId, ctx.orgId)).orderBy(desc(schema.examinations.createdAt));
 }
@@ -426,7 +426,7 @@ export async function markingQueue(ctx: OrgCtx) {
   const vis = await visibleLearnerIds(ctx);
   if (vis !== "all" && !vis.length) return [];
   return db.select({ attemptId: schema.examinationAttempts.id, exam: schema.examinations.title, learner: schema.users.fullName, submittedAt: schema.examinationAttempts.submittedAt,
-    pending: sql<number>`(select count(*)::int from attempt_answers aa where aa.attempt_id = ${schema.examinationAttempts.id} and aa.review_status = 'pending' and aa.awarded_marks is null)` })
+    pending: sql<number>`(select count(*)::int from attempt_answers aa where aa.attempt_id = ${qid(schema.examinationAttempts)} and aa.review_status = 'pending' and aa.awarded_marks is null)` })
     .from(schema.examinationAttempts).innerJoin(schema.examinations, eq(schema.examinations.id, schema.examinationAttempts.examId)).innerJoin(schema.users, eq(schema.users.id, schema.examinationAttempts.learnerId))
     .where(and(eq(schema.examinationAttempts.organizationId, ctx.orgId), eq(schema.examinationAttempts.gradingStatus, "pending_review"), vis === "all" ? undefined : inArray(schema.examinationAttempts.learnerId, vis))).orderBy(asc(schema.examinationAttempts.submittedAt));
 }

@@ -1,6 +1,6 @@
 import "server-only";
 import { and, asc, desc, eq, ilike, inArray, ne, or, sql } from "drizzle-orm";
-import { getDb, schema, type DB, type Tx } from "../db";
+import { getDb, schema, type DB, type Tx, qid } from "../db";
 import { AccessError, NotFoundError } from "../org";
 import { audit, type Actor } from "../audit";
 import { sha256 } from "../crypto";
@@ -40,7 +40,7 @@ export async function listCatalog(f: CatalogFilter = {}) {
 
 export async function listCategories() {
   const db = await getDb();
-  return db.select({ c: schema.curriculumCategories, published: sql<number>`(select count(*)::int from curricula x where x.category_id = ${schema.curriculumCategories.id} and x.status = 'published')`, total: sql<number>`(select count(*)::int from curricula x where x.category_id = ${schema.curriculumCategories.id})` })
+  return db.select({ c: schema.curriculumCategories, published: sql<number>`(select count(*)::int from curricula x where x.category_id = ${qid(schema.curriculumCategories)} and x.status = 'published')`, total: sql<number>`(select count(*)::int from curricula x where x.category_id = ${qid(schema.curriculumCategories)})` })
     .from(schema.curriculumCategories).orderBy(asc(schema.curriculumCategories.sortOrder));
 }
 
@@ -107,11 +107,11 @@ export async function adminListCurricula(f: { q?: string; status?: string; categ
     f.category ? eq(schema.curriculumCategories.slug, f.category) : undefined,
   );
   const rows = await db.select({ c: schema.curricula, cat: schema.curriculumCategories.name,
-    latestVersionId: sql<string | null>`(select v.id from curriculum_versions v where v.curriculum_id = ${schema.curricula.id} order by v.version_number desc limit 1)`,
-    latestStatus: sql<string | null>`(select v.status from curriculum_versions v where v.curriculum_id = ${schema.curricula.id} order by v.version_number desc limit 1)`,
-    latestNumber: sql<number | null>`(select v.version_number from curriculum_versions v where v.curriculum_id = ${schema.curricula.id} order by v.version_number desc limit 1)`,
-    latestValid: sql<boolean | null>`(select (v.validation->>'ok')::boolean from curriculum_versions v where v.curriculum_id = ${schema.curricula.id} order by v.version_number desc limit 1)`,
-    lessonCount: sql<number>`(select count(*)::int from curriculum_lessons l join curriculum_versions v on v.id = l.version_id where v.curriculum_id = ${schema.curricula.id} and v.version_number = (select max(v2.version_number) from curriculum_versions v2 where v2.curriculum_id = ${schema.curricula.id}))`,
+    latestVersionId: sql<string | null>`(select v.id from curriculum_versions v where v.curriculum_id = ${qid(schema.curricula)} order by v.version_number desc limit 1)`,
+    latestStatus: sql<string | null>`(select v.status from curriculum_versions v where v.curriculum_id = ${qid(schema.curricula)} order by v.version_number desc limit 1)`,
+    latestNumber: sql<number | null>`(select v.version_number from curriculum_versions v where v.curriculum_id = ${qid(schema.curricula)} order by v.version_number desc limit 1)`,
+    latestValid: sql<boolean | null>`(select (v.validation->>'ok')::boolean from curriculum_versions v where v.curriculum_id = ${qid(schema.curricula)} order by v.version_number desc limit 1)`,
+    lessonCount: sql<number>`(select count(*)::int from curriculum_lessons l join curriculum_versions v on v.id = l.version_id where v.curriculum_id = ${qid(schema.curricula)} and v.version_number = (select max(v2.version_number) from curriculum_versions v2 where v2.curriculum_id = ${qid(schema.curricula)}))`,
   }).from(schema.curricula).leftJoin(schema.curriculumCategories, eq(schema.curriculumCategories.id, schema.curricula.categoryId)).where(where).orderBy(asc(schema.curricula.catalogNumber), asc(schema.curricula.title)).limit(ps).offset(off);
   const [{ n }] = await db.select({ n: sql<number>`count(*)::int` }).from(schema.curricula).leftJoin(schema.curriculumCategories, eq(schema.curriculumCategories.id, schema.curricula.categoryId)).where(where);
   return { rows, total: n, page: f.page ?? 1, pageSize: ps };

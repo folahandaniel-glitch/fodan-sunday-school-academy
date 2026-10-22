@@ -1,6 +1,6 @@
 import "server-only";
 import { and, asc, desc, eq, gte, inArray, lte, sql } from "drizzle-orm";
-import { getDb, schema } from "../db";
+import { getDb, schema, qid } from "../db";
 import { assertCan, teacherClassIds, type OrgCtx } from "../org";
 import { pct } from "@/lib/text";
 import { hasFeature } from "./entitlements";
@@ -73,7 +73,7 @@ export async function sessionReport(ctx: OrgCtx, assignmentId: string) {
   const db = await getDb();
   const lessons = await db.select({ week: schema.scheduledLessons.weekNumber, date: schema.scheduledLessons.scheduledDate, type: schema.scheduledLessons.lessonType, status: schema.scheduledLessons.status, title: schema.curriculumLessons.title })
     .from(schema.scheduledLessons).innerJoin(schema.curriculumLessons, eq(schema.curriculumLessons.id, schema.scheduledLessons.lessonId)).where(and(eq(schema.scheduledLessons.assignmentId, assignmentId), eq(schema.scheduledLessons.organizationId, ctx.orgId))).orderBy(asc(schema.scheduledLessons.weekNumber));
-  const exams = await db.select({ title: schema.examinations.title, kind: schema.examinations.kind, status: schema.examinations.status, n: sql<number>`(select count(*)::int from assessment_results r where r.exam_id = ${schema.examinations.id})`, avg: sql<number | null>`(select avg(percentage)::float from assessment_results r where r.exam_id = ${schema.examinations.id})`, pass: sql<number>`(select count(*)::int from assessment_results r where r.exam_id = ${schema.examinations.id} and r.pass_status = 'pass')` })
+  const exams = await db.select({ title: schema.examinations.title, kind: schema.examinations.kind, status: schema.examinations.status, n: sql<number>`(select count(*)::int from assessment_results r where r.exam_id = ${qid(schema.examinations)})`, avg: sql<number | null>`(select avg(percentage)::float from assessment_results r where r.exam_id = ${qid(schema.examinations)})`, pass: sql<number>`(select count(*)::int from assessment_results r where r.exam_id = ${qid(schema.examinations)} and r.pass_status = 'pass')` })
     .from(schema.examinations).where(and(eq(schema.examinations.assignmentId, assignmentId), eq(schema.examinations.organizationId, ctx.orgId)));
   return { lessons, exams };
 }

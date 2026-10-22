@@ -1,6 +1,6 @@
 import "server-only";
 import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
-import { getDb, schema } from "../db";
+import { getDb, schema, qid } from "../db";
 import { AccessError, NotFoundError, assertCan, type OrgCtx } from "../org";
 import { audit } from "../audit";
 import { assertWithinLimit, curriculumTierAllowed, EntitlementError, limitOf } from "./entitlements";
@@ -143,7 +143,7 @@ export async function listProgrammes(ctx: OrgCtx) {
   assertCan(ctx, "classes.view");
   const db = await getDb();
   return db.select({ a: schema.curriculumAssignments, s: schema.academicSessions, title: schema.curricula.title, slug: schema.curricula.slug, versionNumber: schema.curriculumVersions.versionNumber, currentVersionId: schema.curricula.currentVersionId,
-    delivered: sql<number>`(select count(*)::int from scheduled_lessons sl where sl.assignment_id = ${schema.curriculumAssignments.id} and sl.status = 'completed')` })
+    delivered: sql<number>`(select count(*)::int from scheduled_lessons sl where sl.assignment_id = ${qid(schema.curriculumAssignments)} and sl.status = 'completed')` })
     .from(schema.curriculumAssignments)
     .innerJoin(schema.academicSessions, eq(schema.academicSessions.id, schema.curriculumAssignments.sessionId))
     .innerJoin(schema.curricula, eq(schema.curricula.id, schema.curriculumAssignments.curriculumId))

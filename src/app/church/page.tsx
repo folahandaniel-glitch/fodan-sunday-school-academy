@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { can } from "@/server/org";
 import type { Metadata } from "next";
 import { requireOrg } from "@/server/guards";
 import { churchOverview } from "@/server/services/reports";
@@ -25,6 +26,15 @@ export default async function ChurchHome({ searchParams }: { searchParams: Promi
       {org.joinCode && ctx.role === "church_admin" && <div className="mb-4"><Alert tone="info">Give this church member code to your members. When they register, choose your church and enter it: they are approved straight away. Your church member code: <strong className="font-mono text-base">{org.joinCode}</strong></Alert></div>}
       {o.pending > 0 && <div className="mb-4"><Alert tone="warn"><Link href="/church/members?status=pending" className="font-semibold">{o.pending} member(s) are waiting for your approval.</Link></Alert></div>}
       {updates.map((u) => <div key={u.id} className="mb-4"><Alert tone="info">A newer version of <strong>{u.title}</strong> is available. Your programme has not changed. <Link href={`/church/sessions/${u.id}`} className="font-semibold">Review what is new</Link></Alert></div>)}
+      {(o.learners === 0 || active.length === 0) && can(ctx, "classes.manage") && (
+        <Card className="mb-4"><h2 className="text-lg">Getting started</h2><p className="mt-1 text-sm text-mist">Work through these steps in order. Each button takes you straight there.</p>
+          <ol className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <li className="rounded-xl border border-line p-3 text-sm"><p className="font-semibold text-navy">1. Bring in your members</p><p className="mt-1 text-mist">Share your church member code, then approve who joins.</p><Link className="btn btn-light btn-sm mt-2" href="/church/members">Members</Link></li>
+            <li className="rounded-xl border border-line p-3 text-sm"><p className="font-semibold text-navy">2. Create a class</p><p className="mt-1 text-mist">Add classes, assign teachers and enrol learners.</p><Link className="btn btn-light btn-sm mt-2" href="/church/classes">Classes</Link></li>
+            <li className="rounded-xl border border-line p-3 text-sm"><p className="font-semibold text-navy">3. Choose a curriculum</p><p className="mt-1 text-mist">Browse the library and pick what to teach.</p><Link className="btn btn-light btn-sm mt-2" href="/church/library">Curriculum library</Link></li>
+            <li className="rounded-xl border border-line p-3 text-sm"><p className="font-semibold text-navy">4. Start a programme</p><p className="mt-1 text-mist">Set the session dates and activate the 26 weeks.</p><Link className="btn btn-gold btn-sm mt-2" href="/church/sessions/new">New programme</Link></li>
+          </ol></Card>
+      )}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Stat label="Learners" value={o.learners} href="/church/members?role=learner" /><Stat label="Teachers" value={o.teachers} href="/church/members?role=teacher" /><Stat label="Classes" value={o.classes} href="/church/classes" /><Stat label="Active programmes" value={o.programmes} href="/church/sessions" />
         <Stat label="Average attendance" value={o.attendancePercent === null ? "–" : `${o.attendancePercent}%`} /><Stat label="Released results" value={o.resultsCount} /><Stat label="Average score" value={o.averageScore === null ? "–" : `${o.averageScore}%`} /><Stat label="Pass rate" value={o.passRate === null ? "–" : `${o.passRate}%`} />

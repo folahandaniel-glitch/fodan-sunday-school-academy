@@ -1,6 +1,6 @@
 import "server-only";
 import { and, asc, desc, eq, ilike, ne, or, sql } from "drizzle-orm";
-import { getDb, schema } from "../db";
+import { getDb, schema, qid } from "../db";
 import { AccessError, NotFoundError } from "../org";
 import { audit, type Actor } from "../audit";
 import { hashPassword } from "../auth/password";
@@ -16,9 +16,9 @@ export async function listChurches(f: { q?: string; status?: string; page?: numb
   const ps = Math.min(f.pageSize ?? 25, 100), off = ((f.page ?? 1) - 1) * ps;
   const where = and(f.status ? eq(schema.organizations.status, f.status as "active") : undefined, f.q ? or(ilike(schema.organizations.name, `%${f.q}%`), ilike(schema.organizations.city, `%${f.q}%`), ilike(schema.organizations.contactEmail, `%${f.q}%`)) : undefined);
   const rows = await db.select({ o: schema.organizations,
-    members: sql<number>`(select count(*)::int from organization_memberships m where m.organization_id = ${schema.organizations.id} and m.status = 'active')`,
-    pending: sql<number>`(select count(*)::int from organization_memberships m where m.organization_id = ${schema.organizations.id} and m.status = 'pending')`,
-    plan: sql<string | null>`(select p.name from organization_subscriptions s join subscription_plans p on p.id = s.plan_id where s.organization_id = ${schema.organizations.id} and s.status = 'active' order by s.created_at desc limit 1)` })
+    members: sql<number>`(select count(*)::int from organization_memberships m where m.organization_id = ${qid(schema.organizations)} and m.status = 'active')`,
+    pending: sql<number>`(select count(*)::int from organization_memberships m where m.organization_id = ${qid(schema.organizations)} and m.status = 'pending')`,
+    plan: sql<string | null>`(select p.name from organization_subscriptions s join subscription_plans p on p.id = s.plan_id where s.organization_id = ${qid(schema.organizations)} and s.status = 'active' order by s.created_at desc limit 1)` })
     .from(schema.organizations).where(where).orderBy(desc(schema.organizations.createdAt)).limit(ps).offset(off);
   const [{ n }] = await db.select({ n: sql<number>`count(*)::int` }).from(schema.organizations).where(where);
   return { rows, total: n, page: f.page ?? 1, pageSize: ps };
@@ -72,7 +72,7 @@ export async function listUsers(f: { q?: string; role?: string; status?: string;
   const ps = Math.min(f.pageSize ?? 25, 100), off = ((f.page ?? 1) - 1) * ps;
   const where = and(f.role ? eq(schema.users.platformRole, f.role as PlatformRole) : undefined, f.status ? eq(schema.users.status, f.status as "active") : undefined, f.q ? or(ilike(schema.users.fullName, `%${f.q}%`), ilike(schema.users.email, `%${f.q}%`)) : undefined);
   const rows = await db.select({ u: { id: schema.users.id, name: schema.users.fullName, email: schema.users.email, username: schema.users.username, role: schema.users.platformRole, status: schema.users.status, lastLoginAt: schema.users.lastLoginAt, createdAt: schema.users.createdAt, mfa: schema.users.totpEnabled },
-    church: sql<string | null>`(select o.name from organization_memberships m join organizations o on o.id = m.organization_id where m.user_id = ${schema.users.id} order by m.created_at limit 1)` })
+    church: sql<string | null>`(select o.name from organization_memberships m join organizations o on o.id = m.organization_id where m.user_id = ${qid(schema.users)} order by m.created_at limit 1)` })
     .from(schema.users).where(where).orderBy(desc(schema.users.createdAt)).limit(ps).offset(off);
   const [{ n }] = await db.select({ n: sql<number>`count(*)::int` }).from(schema.users).where(where);
   return { rows, total: n, page: f.page ?? 1, pageSize: ps };

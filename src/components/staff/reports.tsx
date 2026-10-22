@@ -18,7 +18,7 @@ export async function ReportsView({ ctx, base, sp }: { ctx: OrgCtx; base: string
         <div className="flex items-end"><button className="btn btn-primary w-full">Apply</button></div>
       </form>
       <div className="grid gap-4 sm:grid-cols-4"><Stat label="Learners" value={rep.learners.length} /><Stat label="Learners needing support" value={rep.support.length} /><Stat label="Average exam score" value={rep.averageScore === null ? "–" : `${rep.averageScore}%`} /><Stat label="Pass rate" value={rep.passRate === null ? "–" : `${rep.passRate}%`} /></div>
-      {rep.learners.length === 0 ? <div className="mt-6"><Empty title="No learners in scope">Enrol learners in a class to see their records here.</Empty></div> : (
+      {rep.learners.length === 0 ? <div className="mt-6"><Empty title="No learners in scope" action={<div className="flex flex-wrap justify-center gap-2"><Link className="btn btn-primary" href={`${base}/classes`}>Create or open a class</Link><Link className="btn btn-light" href={`${base}/members`}>Members</Link></div>}>Reports show attendance, lesson progress and results for the learners in your classes. Approve your members, enrol learners in a class and run a programme to see their records here.</Empty></div> : (
         <>
           {rep.support.length > 0 && <div className="mt-6"><Alert tone="warn"><strong>May need extra support:</strong> {rep.support.map((l) => l.name).join(", ")}. Flagged for low attendance (under 50%), low exam average (under 40%) or low lesson completion.</Alert></div>}
           <h2 className="mb-2 mt-6 text-lg">Learner records</h2>

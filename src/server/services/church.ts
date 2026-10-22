@@ -1,7 +1,7 @@
 import "server-only";
 import { and, asc, desc, eq, ilike, inArray, ne, or, sql } from "drizzle-orm";
 import { z } from "zod";
-import { getDb, schema } from "../db";
+import { getDb, schema, qid } from "../db";
 import { AccessError, NotFoundError, assertCan, assertClassAccess, teacherClassIds, type OrgCtx } from "../org";
 import { audit } from "../audit";
 import { assertWithinLimit } from "./entitlements";
@@ -138,8 +138,8 @@ export async function listClasses(ctx: OrgCtx) {
   const db = await getDb();
   const allowed = await teacherClassIds(ctx);
   const rows = await db.select({ id: schema.classes.id, name: schema.classes.name, description: schema.classes.description, ageGroup: schema.classes.ageGroup, status: schema.classes.status,
-    learners: sql<number>`(select count(*)::int from class_memberships cm where cm.class_id = ${schema.classes.id} and cm.status = 'active')`,
-    teachers: sql<string[]>`coalesce((select array_agg(u.full_name order by u.full_name) from class_teacher_assignments ct join users u on u.id = ct.teacher_id where ct.class_id = ${schema.classes.id}), '{}')` })
+    learners: sql<number>`(select count(*)::int from class_memberships cm where cm.class_id = ${qid(schema.classes)} and cm.status = 'active')`,
+    teachers: sql<string[]>`coalesce((select array_agg(u.full_name order by u.full_name) from class_teacher_assignments ct join users u on u.id = ct.teacher_id where ct.class_id = ${qid(schema.classes)}), '{}')` })
     .from(schema.classes).where(and(eq(schema.classes.organizationId, ctx.orgId), allowed === "all" ? undefined : inArray(schema.classes.id, allowed.length ? allowed : ["00000000-0000-0000-0000-000000000000"]))).orderBy(asc(schema.classes.name));
   return rows;
 }

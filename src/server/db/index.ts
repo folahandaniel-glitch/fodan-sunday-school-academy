@@ -55,3 +55,5 @@ async function init(): Promise<DB> {
 }
 
 export { schema };
+
+export { qid } from "./sql";

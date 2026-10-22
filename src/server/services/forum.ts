@@ -1,6 +1,6 @@
 import "server-only";
 import { and, asc, desc, eq, sql } from "drizzle-orm";
-import { getDb, schema } from "../db";
+import { getDb, schema, qid } from "../db";
 import { AccessError, NotFoundError } from "../org";
 import { rateLimit } from "../rate-limit";
 import { audit, type Actor } from "../audit";
@@ -15,13 +15,13 @@ import type { SessionUser } from "../auth/session";
  */
 export async function forumCategories() {
   const db = await getDb();
-  return db.select({ c: schema.forumCategories, threads: sql<number>`(select count(*)::int from forum_threads t where t.category_id = ${schema.forumCategories.id} and t.status <> 'hidden')` }).from(schema.forumCategories).orderBy(asc(schema.forumCategories.sortOrder));
+  return db.select({ c: schema.forumCategories, threads: sql<number>`(select count(*)::int from forum_threads t where t.category_id = ${qid(schema.forumCategories)} and t.status <> 'hidden')` }).from(schema.forumCategories).orderBy(asc(schema.forumCategories.sortOrder));
 }
 
 async function authorLabels(ids: string[]) {
   if (!ids.length) return new Map<string, { name: string; church: string | null; staff: boolean }>();
   const db = await getDb();
-  const rows = await db.select({ u: schema.users, church: sql<string | null>`(select o.name from organization_memberships m join organizations o on o.id = m.organization_id where m.user_id = ${schema.users.id} and m.status = 'active' and o.status = 'active' order by m.created_at limit 1)` })
+  const rows = await db.select({ u: schema.users, church: sql<string | null>`(select o.name from organization_memberships m join organizations o on o.id = m.organization_id where m.user_id = ${qid(schema.users)} and m.status = 'active' and o.status = 'active' order by m.created_at limit 1)` })
     .from(schema.users).where(sql`${schema.users.id} in (${sql.join(ids.map((i) => sql`${i}`), sql`, `)})`);
   return new Map(rows.map((r) => [r.u.id, { name: initialsName(r.u.fullName), church: r.u.showChurchInForum ? r.church : null, staff: r.u.platformRole === "super_admin" || r.u.platformRole === "curriculum_admin" }]));
 }

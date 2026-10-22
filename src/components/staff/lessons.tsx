@@ -24,7 +24,7 @@ export async function LessonsIndex({ ctx, base }: { ctx: OrgCtx; base: string })
   return (
     <>
       <PageHeader title="Weekly lessons" sub="Open a lesson to read the teaching notes, record attendance, mark it delivered and run discussions." />
-      {lists.length === 0 && <Empty title="No active programme">When a programme is active for your class, its 26 lessons appear here.</Empty>}
+      {lists.length === 0 && <Empty title="No active programme yet" action={<div className="flex flex-wrap justify-center gap-2"><Link className="btn btn-primary" href={`${base}/library`}>Choose a curriculum</Link><Link className="btn btn-light" href={`${base}/sessions`}>Academic sessions</Link><Link className="btn btn-light" href={`${base}/classes`}>Classes</Link></div>}>Lessons appear here once a programme is active: 1) create a class and enrol learners, 2) choose a curriculum, 3) set the session dates and activate the programme. Its 26 weekly lessons, attendance sheets and discussions then open from this page.</Empty>}
       {lists.map(({ p, lessons }) => (
         <section key={p.id} className="mb-8"><h2 className="mb-2 text-xl">{p.title} <span className="text-sm font-normal text-mist">· {p.session}</span></h2>
           <ol className="divide-y divide-line rounded-xl border border-line bg-white">
