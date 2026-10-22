@@ -442,6 +442,29 @@ export async function approveAndPublishAllValid(actor: Actor) {
   return { done, skipped };
 }
 
+/** Bulk review: approve (freeze) every in-review version that passes validation, without publishing. */
+export async function approveAllValid(actor: Actor) {
+  const db = await getDb();
+  const rows = await db.select({ v: schema.curriculumVersions, title: schema.curricula.title }).from(schema.curriculumVersions).innerJoin(schema.curricula, eq(schema.curricula.id, schema.curriculumVersions.curriculumId)).where(eq(schema.curriculumVersions.status, "in_review")).orderBy(schema.curricula.catalogNumber);
+  const done: string[] = [], skipped: { title: string; reason: string }[] = [];
+  for (const { v, title } of rows) {
+    const r = await reviewDecision(actor, v.id, "approve", "Bulk review by the Super Admin.");
+    if (!r.ok) skipped.push({ title, reason: r.error }); else done.push(title);
+  }
+  return { done, skipped };
+}
+
+/** Bulk publish: publish every approved version so churches can select it. Earlier published versions are superseded safely by publishVersion. */
+export async function publishAllApproved(actor: Actor) {
+  const db = await getDb();
+  const rows = await db.select({ v: schema.curriculumVersions, title: schema.curricula.title }).from(schema.curriculumVersions).innerJoin(schema.curricula, eq(schema.curricula.id, schema.curriculumVersions.curriculumId)).where(eq(schema.curriculumVersions.status, "approved")).orderBy(schema.curricula.catalogNumber);
+  const done: string[] = [], skipped: { title: string; reason: string }[] = [];
+  for (const { v, title } of rows) {
+    try { await publishVersion(actor, v.id); done.push(title); } catch (e) { skipped.push({ title, reason: (e as Error).message }); }
+  }
+  return { done, skipped };
+}
+
 export { validateLesson, getSetting };
 
 /** Builds the lesson as a learner or teacher would see it, for the Super Admin's preview. Nothing is scheduled or stored. */

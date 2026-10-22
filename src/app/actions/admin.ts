@@ -64,6 +64,12 @@ export async function publishAction(_: FormState | null, fd: FormData): Promise<
 export async function approveAllAction(_: FormState | null): Promise<FormState> {
   return run(async () => { const { a } = await actor("curriculum.publish"); const r = await cur.approveAndPublishAllValid(a); return { message: `${r.done.length} curriculum version(s) approved and published.${r.skipped.length ? ` ${r.skipped.length} skipped because they fail validation.` : ""}` }; });
 }
+export async function reviewAllAction(_: FormState | null): Promise<FormState> {
+  return run(async () => { const { a } = await actor("curriculum.review"); const r = await cur.approveAllValid(a); return { message: `${r.done.length} curriculum version(s) reviewed and approved.${r.skipped.length ? ` ${r.skipped.length} skipped: ${r.skipped.slice(0, 3).map((x) => `${x.title} (${x.reason})`).join("; ")}.` : ""} Use Publish all to make them available to churches.` }; });
+}
+export async function publishAllAction(_: FormState | null): Promise<FormState> {
+  return run(async () => { const { a } = await actor("curriculum.publish"); const r = await cur.publishAllApproved(a); return { message: `${r.done.length} curriculum version(s) published.${r.skipped.length ? ` ${r.skipped.length} skipped: ${r.skipped.slice(0, 3).map((x) => `${x.title} (${x.reason})`).join("; ")}.` : ""} Churches already teaching an earlier version are not affected.` }; });
+}
 export async function newDraftAction(_: FormState | null, fd: FormData): Promise<FormState> {
   return run(async () => { const { a } = await actor("curriculum.write"); const r = await cur.createDraftFromVersion(a, s(fd, "versionId"), s(fd, "summary")); if (!r.ok) return fail(r.error); return { redirect: `/admin/curricula/${s(fd, "id")}/v/${r.id}` }; });
 }
