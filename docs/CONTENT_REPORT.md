@@ -5,11 +5,11 @@ Generated 2026-10-22 by `npm run content:report`.
 | Measure | Value |
 |---|---|
 | Curricula in catalogue | 50 |
-| Curricula with authored content | 13 |
-| Curricula passing every completeness rule | 13 |
-| Lesson units complete | 338 of 1300 |
-| Teaching words in complete lessons | 232,845 |
-| Questions in banks | 1,352 |
+| Curricula with authored content | 14 |
+| Curricula passing every completeness rule | 14 |
+| Lesson units complete | 364 of 1300 |
+| Teaching words in complete lessons | 250,765 |
+| Questions in banks | 1,456 |
 
 "Passes" means: 26 units present; every unit has a title, summary, theme, Scripture that resolves to real Bible text, memory verse, 3+ objectives, 3+ key terms, introduction, context, exegetical observations, 3+ teaching points, 4+ discussion questions with facilitator guidance, application, activity, take-home, prayer, teacher guidance and assessment note above minimum sizes; no placeholder text; no paragraph repeated across lessons; both blueprints present; and enough approved questions to draw a mid-session test (weeks 1-12) and a final examination (both halves). **It does not mean the content has been theologically reviewed.** Every curriculum waits for a human reviewer before it can be published to churches.
 
@@ -28,7 +28,7 @@ Generated 2026-10-22 by `npm run content:report`.
 | 11 | The Power and Practice of Prayer | passes | 26/26 | 17,657 | 104 |
 | 12 | Understanding and Studying the Bible | passes | 26/26 | 17,836 | 104 |
 | 13 | Faith That Overcomes Challenges | passes | 26/26 | 18,132 | 104 |
-| 14 | Fasting and Spiritual Discipline | not yet authored | 0/26 | 0 | 0 |
+| 14 | Fasting and Spiritual Discipline | passes | 26/26 | 17,920 | 104 |
 | 15 | The Fruit of the Holy Spirit | not yet authored | 0/26 | 0 | 0 |
 | 16 | The Gifts of the Holy Spirit | not yet authored | 0/26 | 0 | 0 |
 | 17 | Holiness and Sanctification | not yet authored | 0/26 | 0 | 0 |
