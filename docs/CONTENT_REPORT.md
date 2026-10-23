@@ -5,11 +5,11 @@ Generated 2026-10-23 by `npm run content:report`.
 | Measure | Value |
 |---|---|
 | Curricula in catalogue | 50 |
-| Curricula with authored content | 37 |
-| Curricula passing every completeness rule | 37 |
-| Lesson units complete | 962 of 1300 |
-| Teaching words in complete lessons | 651,763 |
-| Questions in banks | 3,848 |
+| Curricula with authored content | 38 |
+| Curricula passing every completeness rule | 38 |
+| Lesson units complete | 988 of 1300 |
+| Teaching words in complete lessons | 669,910 |
+| Questions in banks | 3,952 |
 
 "Passes" means: 26 units present; every unit has a title, summary, theme, Scripture that resolves to real Bible text, memory verse, 3+ objectives, 3+ key terms, introduction, context, exegetical observations, 3+ teaching points, 4+ discussion questions with facilitator guidance, application, activity, take-home, prayer, teacher guidance and assessment note above minimum sizes; no placeholder text; no paragraph repeated across lessons; both blueprints present; and enough approved questions to draw a mid-session test (weeks 1-12) and a final examination (both halves). **It does not mean the content has been theologically reviewed.** Every curriculum waits for a human reviewer before it can be published to churches.
 
@@ -52,7 +52,7 @@ Generated 2026-10-23 by `npm run content:report`.
 | 35 | Servant Leadership According to Jesus | passes | 26/26 | 17,866 | 104 |
 | 36 | Church Unity and the Ministry of Reconciliation | passes | 26/26 | 18,160 | 104 |
 | 37 | Discovering and Developing Spiritual Gifts | passes | 26/26 | 17,871 | 104 |
-| 38 | Missions, Compassion and Community Outreach | not yet authored | 0/26 | 0 | 0 |
+| 38 | Missions, Compassion and Community Outreach | passes | 26/26 | 18,147 | 104 |
 | 39 | Biblical Church Discipline and Accountability | not yet authored | 0/26 | 0 | 0 |
 | 40 | Revival, Prayer and Spiritual Awakening | not yet authored | 0/26 | 0 | 0 |
 | 41 | The Christian and the World | not yet authored | 0/26 | 0 | 0 |
