@@ -1,15 +1,15 @@
 # Content completeness report
 
-Generated 2026-10-22 by `npm run content:report`.
+Generated 2026-10-23 by `npm run content:report`.
 
 | Measure | Value |
 |---|---|
 | Curricula in catalogue | 50 |
-| Curricula with authored content | 24 |
-| Curricula passing every completeness rule | 24 |
-| Lesson units complete | 624 of 1300 |
-| Teaching words in complete lessons | 423,754 |
-| Questions in banks | 2,496 |
+| Curricula with authored content | 25 |
+| Curricula passing every completeness rule | 25 |
+| Lesson units complete | 650 of 1300 |
+| Teaching words in complete lessons | 440,456 |
+| Questions in banks | 2,600 |
 
 "Passes" means: 26 units present; every unit has a title, summary, theme, Scripture that resolves to real Bible text, memory verse, 3+ objectives, 3+ key terms, introduction, context, exegetical observations, 3+ teaching points, 4+ discussion questions with facilitator guidance, application, activity, take-home, prayer, teacher guidance and assessment note above minimum sizes; no placeholder text; no paragraph repeated across lessons; both blueprints present; and enough approved questions to draw a mid-session test (weeks 1-12) and a final examination (both halves). **It does not mean the content has been theologically reviewed.** Every curriculum waits for a human reviewer before it can be published to churches.
 
@@ -39,7 +39,7 @@ Generated 2026-10-22 by `npm run content:report`.
 | 22 | Raising Children in the Fear of the Lord | passes | 26/26 | 17,082 | 104 |
 | 23 | Christian Parenting in the Digital Age | passes | 26/26 | 17,024 | 104 |
 | 24 | Forgiveness, Reconciliation and Healing Relationships | passes | 26/26 | 16,903 | 104 |
-| 25 | Integrity, Honesty and Godly Character | not yet authored | 0/26 | 0 | 0 |
+| 25 | Integrity, Honesty and Godly Character | passes | 26/26 | 16,702 | 104 |
 | 26 | Christian Stewardship and Financial Responsibility | not yet authored | 0/26 | 0 | 0 |
 | 27 | Contentment, Generosity and Biblical Giving | not yet authored | 0/26 | 0 | 0 |
 | 28 | Handling Anger, Offences and Conflict | not yet authored | 0/26 | 0 | 0 |
