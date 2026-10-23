@@ -5,11 +5,11 @@ Generated 2026-10-23 by `npm run content:report`.
 | Measure | Value |
 |---|---|
 | Curricula in catalogue | 50 |
-| Curricula with authored content | 42 |
-| Curricula passing every completeness rule | 42 |
-| Lesson units complete | 1092 of 1300 |
-| Teaching words in complete lessons | 737,653 |
-| Questions in banks | 4,368 |
+| Curricula with authored content | 43 |
+| Curricula passing every completeness rule | 43 |
+| Lesson units complete | 1118 of 1300 |
+| Teaching words in complete lessons | 752,452 |
+| Questions in banks | 4,472 |
 
 "Passes" means: 26 units present; every unit has a title, summary, theme, Scripture that resolves to real Bible text, memory verse, 3+ objectives, 3+ key terms, introduction, context, exegetical observations, 3+ teaching points, 4+ discussion questions with facilitator guidance, application, activity, take-home, prayer, teacher guidance and assessment note above minimum sizes; no placeholder text; no paragraph repeated across lessons; both blueprints present; and enough approved questions to draw a mid-session test (weeks 1-12) and a final examination (both halves). **It does not mean the content has been theologically reviewed.** Every curriculum waits for a human reviewer before it can be published to churches.
 
@@ -57,7 +57,7 @@ Generated 2026-10-23 by `npm run content:report`.
 | 40 | Revival, Prayer and Spiritual Awakening | passes | 26/26 | 18,282 | 104 |
 | 41 | The Christian and the World | passes | 26/26 | 15,611 | 104 |
 | 42 | Youth, Purpose and Divine Calling | passes | 26/26 | 15,309 | 104 |
-| 43 | Christian Ethics in the Digital Age | not yet authored | 0/26 | 0 | 0 |
+| 43 | Christian Ethics in the Digital Age | passes | 26/26 | 14,799 | 104 |
 | 44 | Biblical Wisdom for Decision Making | not yet authored | 0/26 | 0 | 0 |
 | 45 | Overcoming Fear, Anxiety and Discouragement Through Biblical Truth | not yet authored | 0/26 | 0 | 0 |
 | 46 | Justice, Mercy and Care for the Vulnerable | not yet authored | 0/26 | 0 | 0 |
