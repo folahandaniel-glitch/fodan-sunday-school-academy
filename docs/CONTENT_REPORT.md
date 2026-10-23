@@ -5,11 +5,11 @@ Generated 2026-10-23 by `npm run content:report`.
 | Measure | Value |
 |---|---|
 | Curricula in catalogue | 50 |
-| Curricula with authored content | 28 |
-| Curricula passing every completeness rule | 28 |
-| Lesson units complete | 728 of 1300 |
-| Teaching words in complete lessons | 491,999 |
-| Questions in banks | 2,912 |
+| Curricula with authored content | 29 |
+| Curricula passing every completeness rule | 29 |
+| Lesson units complete | 754 of 1300 |
+| Teaching words in complete lessons | 508,990 |
+| Questions in banks | 3,016 |
 
 "Passes" means: 26 units present; every unit has a title, summary, theme, Scripture that resolves to real Bible text, memory verse, 3+ objectives, 3+ key terms, introduction, context, exegetical observations, 3+ teaching points, 4+ discussion questions with facilitator guidance, application, activity, take-home, prayer, teacher guidance and assessment note above minimum sizes; no placeholder text; no paragraph repeated across lessons; both blueprints present; and enough approved questions to draw a mid-session test (weeks 1-12) and a final examination (both halves). **It does not mean the content has been theologically reviewed.** Every curriculum waits for a human reviewer before it can be published to churches.
 
@@ -43,7 +43,7 @@ Generated 2026-10-23 by `npm run content:report`.
 | 26 | Christian Stewardship and Financial Responsibility | passes | 26/26 | 17,173 | 104 |
 | 27 | Contentment, Generosity and Biblical Giving | passes | 26/26 | 17,423 | 104 |
 | 28 | Handling Anger, Offences and Conflict | passes | 26/26 | 16,947 | 104 |
-| 29 | Christian Friendship and Godly Relationships | not yet authored | 0/26 | 0 | 0 |
+| 29 | Christian Friendship and Godly Relationships | passes | 26/26 | 16,991 | 104 |
 | 30 | Overcoming Temptation and Building Self Control | not yet authored | 0/26 | 0 | 0 |
 | 31 | The Church as the Body of Christ | not yet authored | 0/26 | 0 | 0 |
 | 32 | The Great Commission and Evangelism | not yet authored | 0/26 | 0 | 0 |
