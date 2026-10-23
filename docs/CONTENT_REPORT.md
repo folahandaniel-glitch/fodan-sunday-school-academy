@@ -5,11 +5,11 @@ Generated 2026-10-23 by `npm run content:report`.
 | Measure | Value |
 |---|---|
 | Curricula in catalogue | 50 |
-| Curricula with authored content | 45 |
-| Curricula passing every completeness rule | 45 |
-| Lesson units complete | 1170 of 1300 |
-| Teaching words in complete lessons | 784,055 |
-| Questions in banks | 4,680 |
+| Curricula with authored content | 46 |
+| Curricula passing every completeness rule | 46 |
+| Lesson units complete | 1196 of 1300 |
+| Teaching words in complete lessons | 799,866 |
+| Questions in banks | 4,784 |
 
 "Passes" means: 26 units present; every unit has a title, summary, theme, Scripture that resolves to real Bible text, memory verse, 3+ objectives, 3+ key terms, introduction, context, exegetical observations, 3+ teaching points, 4+ discussion questions with facilitator guidance, application, activity, take-home, prayer, teacher guidance and assessment note above minimum sizes; no placeholder text; no paragraph repeated across lessons; both blueprints present; and enough approved questions to draw a mid-session test (weeks 1-12) and a final examination (both halves). **It does not mean the content has been theologically reviewed.** Every curriculum waits for a human reviewer before it can be published to churches.
 
@@ -60,7 +60,7 @@ Generated 2026-10-23 by `npm run content:report`.
 | 43 | Christian Ethics in the Digital Age | passes | 26/26 | 14,799 | 104 |
 | 44 | Biblical Wisdom for Decision Making | passes | 26/26 | 15,482 | 104 |
 | 45 | Overcoming Fear, Anxiety and Discouragement Through Biblical Truth | passes | 26/26 | 16,121 | 104 |
-| 46 | Justice, Mercy and Care for the Vulnerable | not yet authored | 0/26 | 0 | 0 |
+| 46 | Justice, Mercy and Care for the Vulnerable | passes | 26/26 | 15,811 | 104 |
 | 47 | Christian Citizenship and Civic Responsibility | not yet authored | 0/26 | 0 | 0 |
 | 48 | Apologetics and Defending the Christian Faith | not yet authored | 0/26 | 0 | 0 |
 | 49 | Understanding Biblical Prophecy Responsibly | not yet authored | 0/26 | 0 | 0 |
