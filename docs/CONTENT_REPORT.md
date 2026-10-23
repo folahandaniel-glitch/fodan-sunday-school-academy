@@ -5,11 +5,11 @@ Generated 2026-10-23 by `npm run content:report`.
 | Measure | Value |
 |---|---|
 | Curricula in catalogue | 50 |
-| Curricula with authored content | 47 |
-| Curricula passing every completeness rule | 47 |
-| Lesson units complete | 1222 of 1300 |
-| Teaching words in complete lessons | 815,688 |
-| Questions in banks | 4,888 |
+| Curricula with authored content | 48 |
+| Curricula passing every completeness rule | 48 |
+| Lesson units complete | 1248 of 1300 |
+| Teaching words in complete lessons | 831,921 |
+| Questions in banks | 4,992 |
 
 "Passes" means: 26 units present; every unit has a title, summary, theme, Scripture that resolves to real Bible text, memory verse, 3+ objectives, 3+ key terms, introduction, context, exegetical observations, 3+ teaching points, 4+ discussion questions with facilitator guidance, application, activity, take-home, prayer, teacher guidance and assessment note above minimum sizes; no placeholder text; no paragraph repeated across lessons; both blueprints present; and enough approved questions to draw a mid-session test (weeks 1-12) and a final examination (both halves). **It does not mean the content has been theologically reviewed.** Every curriculum waits for a human reviewer before it can be published to churches.
 
@@ -62,7 +62,7 @@ Generated 2026-10-23 by `npm run content:report`.
 | 45 | Overcoming Fear, Anxiety and Discouragement Through Biblical Truth | passes | 26/26 | 16,121 | 104 |
 | 46 | Justice, Mercy and Care for the Vulnerable | passes | 26/26 | 15,811 | 104 |
 | 47 | Christian Citizenship and Civic Responsibility | passes | 26/26 | 15,822 | 104 |
-| 48 | Apologetics and Defending the Christian Faith | not yet authored | 0/26 | 0 | 0 |
+| 48 | Apologetics and Defending the Christian Faith | passes | 26/26 | 16,233 | 104 |
 | 49 | Understanding Biblical Prophecy Responsibly | not yet authored | 0/26 | 0 | 0 |
 | 50 | Eternity, Resurrection and the Final Judgment | not yet authored | 0/26 | 0 | 0 |
 
