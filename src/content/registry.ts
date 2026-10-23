@@ -31,6 +31,7 @@ import { lessons as c28 } from "./curricula/c28";
 import { lessons as c29 } from "./curricula/c29";
 import { lessons as c30 } from "./curricula/c30";
 import { lessons as c31 } from "./curricula/c31";
+import { lessons as c32 } from "./curricula/c32";
 
 export const CONTENT: Record<number, LessonSeed[]> = {
   1: c01,
@@ -64,4 +65,5 @@ export const CONTENT: Record<number, LessonSeed[]> = {
   29: c29,
   30: c30,
   31: c31,
+  32: c32,
 };
