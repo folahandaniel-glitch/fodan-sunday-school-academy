@@ -5,11 +5,11 @@ Generated 2026-10-23 by `npm run content:report`.
 | Measure | Value |
 |---|---|
 | Curricula in catalogue | 50 |
-| Curricula with authored content | 32 |
-| Curricula passing every completeness rule | 32 |
-| Lesson units complete | 832 of 1300 |
-| Teaching words in complete lessons | 562,273 |
-| Questions in banks | 3,328 |
+| Curricula with authored content | 33 |
+| Curricula passing every completeness rule | 33 |
+| Lesson units complete | 858 of 1300 |
+| Teaching words in complete lessons | 580,156 |
+| Questions in banks | 3,432 |
 
 "Passes" means: 26 units present; every unit has a title, summary, theme, Scripture that resolves to real Bible text, memory verse, 3+ objectives, 3+ key terms, introduction, context, exegetical observations, 3+ teaching points, 4+ discussion questions with facilitator guidance, application, activity, take-home, prayer, teacher guidance and assessment note above minimum sizes; no placeholder text; no paragraph repeated across lessons; both blueprints present; and enough approved questions to draw a mid-session test (weeks 1-12) and a final examination (both halves). **It does not mean the content has been theologically reviewed.** Every curriculum waits for a human reviewer before it can be published to churches.
 
@@ -47,7 +47,7 @@ Generated 2026-10-23 by `npm run content:report`.
 | 30 | Overcoming Temptation and Building Self Control | passes | 26/26 | 17,383 | 104 |
 | 31 | The Church as the Body of Christ | passes | 26/26 | 18,040 | 104 |
 | 32 | The Great Commission and Evangelism | passes | 26/26 | 17,860 | 104 |
-| 33 | Discipleship and Spiritual Mentorship | not yet authored | 0/26 | 0 | 0 |
+| 33 | Discipleship and Spiritual Mentorship | passes | 26/26 | 17,883 | 104 |
 | 34 | The Character and Responsibilities of Christian Leaders | not yet authored | 0/26 | 0 | 0 |
 | 35 | Servant Leadership According to Jesus | not yet authored | 0/26 | 0 | 0 |
 | 36 | Church Unity and the Ministry of Reconciliation | not yet authored | 0/26 | 0 | 0 |
