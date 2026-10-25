@@ -5,11 +5,11 @@ Generated 2026-10-23 by `npm run content:report`.
 | Measure | Value |
 |---|---|
 | Curricula in catalogue | 50 |
-| Curricula with authored content | 49 |
-| Curricula passing every completeness rule | 49 |
-| Lesson units complete | 1274 of 1300 |
-| Teaching words in complete lessons | 848,612 |
-| Questions in banks | 5,096 |
+| Curricula with authored content | 50 |
+| Curricula passing every completeness rule | 50 |
+| Lesson units complete | 1300 of 1300 |
+| Teaching words in complete lessons | 865,604 |
+| Questions in banks | 5,200 |
 
 "Passes" means: 26 units present; every unit has a title, summary, theme, Scripture that resolves to real Bible text, memory verse, 3+ objectives, 3+ key terms, introduction, context, exegetical observations, 3+ teaching points, 4+ discussion questions with facilitator guidance, application, activity, take-home, prayer, teacher guidance and assessment note above minimum sizes; no placeholder text; no paragraph repeated across lessons; both blueprints present; and enough approved questions to draw a mid-session test (weeks 1-12) and a final examination (both halves). **It does not mean the content has been theologically reviewed.** Every curriculum waits for a human reviewer before it can be published to churches.
 
@@ -64,6 +64,6 @@ Generated 2026-10-23 by `npm run content:report`.
 | 47 | Christian Citizenship and Civic Responsibility | passes | 26/26 | 15,822 | 104 |
 | 48 | Apologetics and Defending the Christian Faith | passes | 26/26 | 16,233 | 104 |
 | 49 | Understanding Biblical Prophecy Responsibly | passes | 26/26 | 16,691 | 104 |
-| 50 | Eternity, Resurrection and the Final Judgment | not yet authored | 0/26 | 0 | 0 |
+| 50 | Eternity, Resurrection and the Final Judgment | passes | 26/26 | 16,992 | 104 |
 
 No problems found in authored curricula.
