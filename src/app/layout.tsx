@@ -4,6 +4,7 @@ import "./globals.css";
 import { getSetting } from "@/server/settings";
 import { mix } from "@/lib/color";
 
+import { organizationJsonLd } from "@/lib/seo-kit";
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -32,6 +33,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   return (
     <html lang="en" style={style}>
       <body>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd()) }} />
         <a href="#main" className="skip-link">Skip to main content</a>
         {children}
       </body>

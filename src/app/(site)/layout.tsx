@@ -5,6 +5,7 @@ import { getSetting } from "@/server/settings";
 import { optionalUser, homeFor } from "@/server/guards";
 import { MobileNav } from "@/components/mobile-nav";
 
+import { FodanCredit } from "@/components/fodan-credit";
 export default async function SiteLayout({ children }: { children: ReactNode }) {
   const [brand, nav, footer, contact, ann, user] = await Promise.all([getSetting("brand"), getSetting("nav"), getSetting("footer"), getSetting("contact"), getSetting("announcement"), optionalUser()]);
   const home = user ? await homeFor(user) : "/login";
@@ -34,6 +35,7 @@ export default async function SiteLayout({ children }: { children: ReactNode }) 
             <ul className="mt-4 space-y-1 text-sm">{footer.links.map((l) => <li key={l.href}><Link className="!text-white/70" href={l.href}>{l.label}</Link></li>)}</ul></div>
         </div>
         <div className="border-t border-white/10 py-4 text-center text-xs text-white/60">© {new Date().getFullYear()} {footer.copyright} Sponsored by {brand.sponsor}.</div>
+        <FodanCredit />
       </footer>
     </>
   );
