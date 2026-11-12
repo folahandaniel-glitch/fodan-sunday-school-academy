@@ -308,3 +308,19 @@ export async function revokeAccessCodeAction(fd: FormData) {
   await accessCodes.revokeAccessCode(a, s(fd, "id"));
   redirect("/admin/access-codes");
 }
+
+/* ---------- interface wording (site editors) ---------- */
+export async function saveWordingAction(_: FormState | null, fd: FormData): Promise<FormState> {
+  return run(async () => {
+    const { a } = await actor("site.edit");
+    const submitted: Record<string, string> = {};
+    for (const [name, v] of fd.entries()) {
+      const m = /^w\.(\d+)$/.exec(name);
+      if (!m || typeof v !== "string") continue;
+      const orig = fd.get(`k.${m[1]}`);
+      if (typeof orig === "string") submitted[orig] = v;
+    }
+    const n = await cms.saveWording(a, submitted);
+    return { message: n ? `Saved. ${n} text${n === 1 ? "" : "s"} changed.` : "Nothing changed." };
+  });
+}

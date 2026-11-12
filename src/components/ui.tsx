@@ -1,18 +1,21 @@
 import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
 import clsx from "clsx";
+import { getT } from "@/server/ui-text";
 
-export function PageHeader({ title, sub, actions, crumbs }: { title: ReactNode; sub?: ReactNode; actions?: ReactNode; crumbs?: { label: string; href?: string }[] }) {
+export async function PageHeader({ title, sub, actions, crumbs }: { title: ReactNode; sub?: ReactNode; actions?: ReactNode; crumbs?: { label: string; href?: string }[] }) {
+  const t = await getT();
+  const tt = (x: ReactNode) => (typeof x === "string" ? t(x) : x);
   return (
     <header className="mb-6 flex flex-wrap items-end justify-between gap-3">
       <div className="min-w-0">
         {crumbs && (
-          <nav aria-label="Breadcrumb" className="mb-1 text-xs text-mist">
-            {crumbs.map((c, i) => (<span key={i}>{i > 0 && " / "}{c.href ? <Link href={c.href}>{c.label}</Link> : c.label}</span>))}
+          <nav aria-label={t("Breadcrumb")} className="mb-1 text-xs text-mist">
+            {crumbs.map((c, i) => (<span key={i}>{i > 0 && " / "}{c.href ? <Link href={c.href}>{t(c.label)}</Link> : t(c.label)}</span>))}
           </nav>
         )}
-        <h1 className="text-2xl sm:text-3xl">{title}</h1>
-        {sub && <p className="mt-1 max-w-3xl text-mist">{sub}</p>}
+        <h1 className="text-2xl sm:text-3xl">{tt(title)}</h1>
+        {sub && <p className="mt-1 max-w-3xl text-mist">{tt(sub)}</p>}
       </div>
       {actions && <div className="no-print flex flex-wrap items-center gap-2">{actions}</div>}
     </header>
@@ -34,11 +37,12 @@ export function Alert({ tone = "info", children }: { tone?: "info" | "ok" | "war
   return <div role={tone === "error" ? "alert" : "status"} className={clsx("alert", `alert-${tone}`)}>{children}</div>;
 }
 
-export function Empty({ title, children, action }: { title: string; children?: ReactNode; action?: ReactNode }) {
+export async function Empty({ title, children, action }: { title: string; children?: ReactNode; action?: ReactNode }) {
+  const t = await getT();
   return (
     <div className="rounded-2xl border border-dashed border-line bg-white/60 p-8 text-center">
-      <p className="font-display text-lg text-navy">{title}</p>
-      {children && <p className="mx-auto mt-1 max-w-md text-sm text-mist">{children}</p>}
+      <p className="font-display text-lg text-navy">{t(title)}</p>
+      {children && <p className="mx-auto mt-1 max-w-md text-sm text-mist">{typeof children === "string" ? t(children) : children}</p>}
       {action && <div className="mt-4">{action}</div>}
     </div>
   );

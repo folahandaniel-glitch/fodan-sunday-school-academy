@@ -67,3 +67,15 @@ export const ADMIN_NAV: NavItem[] = [
   { label: "Audit Logs", href: "/admin/audit", icon: "shield", group: "Operations" },
   { label: "Security", href: "/admin/security", icon: "shield", group: "Operations" },
 ];
+
+/** Permission each admin menu entry needs; entries without one are visible to everyone with admin access. */
+export const ADMIN_NAV_NEEDS: Record<string, string> = {
+  "/admin/churches": "churches.view", "/admin/users": "users.manage", "/admin/curricula": "curriculum.write", "/admin/review": "curriculum.review", "/admin/completeness": "curriculum.write", "/admin/categories": "curriculum.write", "/admin/import": "curriculum.write",
+  "/admin/plans": "plans.manage", "/admin/access-codes": "plans.manage", "/admin/payments": "payments.view", "/admin/site": "site.edit", "/admin/branding": "branding.edit", "/admin/forum": "forum.moderate", "/admin/settings": "settings.manage", "/admin/jobs": "jobs.view", "/admin/audit": "audit.view", "/admin/analytics": "reports.platform",
+};
+
+/** Basic member menu (signed in, no church role yet). */
+export const BASIC_NAV: NavItem[] = [
+  { label: "My Dashboard", href: "/app", icon: "home", exact: true }, { label: "Community Forum", href: "/forum", icon: "chat" },
+  { label: "Notifications", href: "/app/notifications", icon: "bell" }, { label: "My Profile", href: "/app/profile", icon: "user" },
+];

@@ -6,11 +6,11 @@ import type { NavItem } from "@/lib/nav";
 
 const ICONS: Record<string, LucideIcon> = { home: Home, book: BookOpen, calendar: CalendarDays, pencil: Pencil, clipboard: ClipboardCheck, chart: BarChart3, trend: TrendingUp, award: Award, chat: MessageSquare, bell: Bell, user: User, users: Users, check: Check, building: Building2, card: CreditCard, cog: Settings, tag: Tag, upload: Upload, globe: Globe, palette: Palette, shield: ShieldCheck };
 
-export function NavLinks({ items }: { items: NavItem[] }) {
+export function NavLinks({ items, label = "Primary" }: { items: NavItem[]; label?: string }) {
   const path = usePathname();
   const groups: (string | undefined)[] = [...new Set(items.map((i) => i.group))];
   return (
-    <nav aria-label="Primary" className="space-y-3">
+    <nav aria-label={label} className="space-y-3">
       {groups.map((g) => (
         <div key={g ?? "main"}>
           {g && <p className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wider text-white/50">{g}</p>}

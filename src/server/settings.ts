@@ -46,6 +46,8 @@ export const DEFAULTS = {
     verify: { title: "Verify a certificate", intro: "Enter the verification code printed on the certificate (for example FSSA-XXXX-XXXX-XXXX)." },
     pricing: { title: "Plans for every church", intro: "Registration is free. Paid plans add capacity and features, and are set and priced by the Academy. You can change plan at any time." },
   },
+  /** Administrator replacements for interface wording, keyed by the original text (see src/lib/ui-text.ts). */
+  uiText: { overrides: {} as Record<string, string> },
   doctrine: {
     position: "This platform teaches from the Bible as the inspired Word of God and affirms the historic Christian faith. Where faithful Christians differ (for example on the timing and details of the end times), lessons present the main views fairly and say plainly that they are disputed. The approved doctrinal statement is edited by the Super Admin.",
   },

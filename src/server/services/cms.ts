@@ -155,3 +155,28 @@ export async function logoFor(placement: string) {
   const [l] = await db.select().from(schema.logos).where(and(eq(schema.logos.active, true), isNull(schema.logos.organizationId), sql`${schema.logos.placements} @> ${JSON.stringify([placement])}::jsonb`)).orderBy(desc(schema.logos.createdAt)).limit(1);
   return l ?? null;
 }
+
+/* ============================ Interface wording ============================ */
+import { UI_TEXT_CATALOG } from "@/lib/ui-text-catalog";
+import { MAX_OVERRIDE_LEN, MAX_OVERRIDES } from "@/lib/ui-text";
+import { getSettingFresh } from "@/server/settings";
+
+const CATALOG_SET = new Set(UI_TEXT_CATALOG.flatMap((g) => g.items));
+/** Replaces the administrator's wording. Only catalogued texts are accepted; blank or unchanged entries fall back to the original wording. Audited with the changed texts. */
+export async function saveWording(actor: Actor, submitted: Record<string, string>) {
+  const cur = (await getSettingFresh("uiText")).overrides;
+  const next: Record<string, string> = {};
+  for (const [k, v] of Object.entries(cur)) if (!CATALOG_SET.has(k)) next[k] = v; // keep anything not shown in the editor
+  for (const [k, raw] of Object.entries(submitted)) {
+    if (!CATALOG_SET.has(k)) continue;
+    const v = raw.replace(/\r\n/g, "\n").trim();
+    if (!v || v === k) continue;
+    if (v.length > MAX_OVERRIDE_LEN) throw new Error(`The replacement for "${k.slice(0, 40)}…" is longer than ${MAX_OVERRIDE_LEN} characters.`);
+    next[k] = v;
+  }
+  if (Object.keys(next).length > MAX_OVERRIDES) throw new Error("Too many replaced texts.");
+  const changed = [...new Set([...Object.keys(cur), ...Object.keys(next)])].filter((k) => cur[k] !== next[k]);
+  await setSetting("uiText", { overrides: next }, actor.id);
+  await audit(actor, "site.wording_saved", { type: "setting", id: "uiText" }, { changed: changed.length, examples: changed.slice(0, 20).map((k) => ({ from: k.slice(0, 80), to: (next[k] ?? "(original)").slice(0, 80) })) });
+  return changed.length;
+}

@@ -15,8 +15,8 @@
     "admin:bootstrap": "node --conditions=react-server --import tsx scripts/bootstrap-admin.ts",
     "verify": "npm run typecheck && npm run test && npm run build",
     "db:seed": "node --conditions=react-server --import tsx scripts/db-seed.ts",
-    "registry": "node scripts/gen-registry.mjs",
-    "vercel-build": "node scripts/gen-registry.mjs && node --conditions=react-server --import tsx scripts/db-seed.ts && next build"
+    "registry": "node scripts/gen-registry.mjs && node scripts/gen-ui-catalog.mjs",
+    "vercel-build": "node scripts/gen-registry.mjs && node scripts/gen-ui-catalog.mjs && node --conditions=react-server --import tsx scripts/db-seed.ts && next build"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.10",
