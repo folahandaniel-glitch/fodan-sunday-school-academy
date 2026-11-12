@@ -23,7 +23,7 @@ export async function optionalUser() { return (await getSession())?.user ?? null
 
 export async function requirePlatform(perm: PlatformPerm = "admin.access"): Promise<SessionUser> {
   const u = await requireUser();
-  if (!platformCan(u.platformRole, "admin.access") || !platformCan(u.platformRole, perm)) redirect("/app?denied=1");
+  if (!platformCan(u, "admin.access") || !platformCan(u, perm)) redirect("/app?denied=1");
   return u;
 }
 
@@ -50,7 +50,7 @@ export async function actorOf(u: SessionUser | null): Promise<Actor> {
 export async function maintenanceOn() { return (await getSetting("maintenance")).suspended; }
 
 export async function homeFor(user: SessionUser): Promise<string> {
-  if (platformCan(user.platformRole, "admin.access")) return "/admin";
+  if (platformCan(user, "admin.access")) return "/admin";
   const ctx = await resolveOrgCtx(user.id, null);
   if (!ctx) return "/app";
   return ctx.role === "learner" ? "/learn" : ctx.role === "teacher" ? "/teach" : "/church";

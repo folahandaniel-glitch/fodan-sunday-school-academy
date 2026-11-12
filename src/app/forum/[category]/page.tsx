@@ -17,7 +17,7 @@ export default async function Category({ params, searchParams }: { params: Promi
   const page = Math.max(1, Number((await searchParams).page) || 1);
   let data;
   try { data = await listThreads(category, page); } catch (e) { if (e instanceof NotFoundError) notFound(); throw e; }
-  const canPost = !user.isMinor && (!data.category.staffOnlyPosting || platformCan(user.platformRole, "forum.moderate"));
+  const canPost = !user.isMinor && (!data.category.staffOnlyPosting || platformCan(user, "forum.moderate"));
   return (
     <>
       <PageHeader crumbs={[{ label: "Forum", href: "/forum" }, { label: data.category.name }]} title={data.category.name} sub={data.category.description} />

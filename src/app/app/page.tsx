@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export default async function AppHome({ searchParams }: { searchParams: Promise<{ denied?: string; registered?: string }> }) {
   const sp = await searchParams;
   const user = await requireUser();
-  if (platformCan(user.platformRole, "admin.access")) redirect("/admin");
+  if (platformCan(user, "admin.access")) redirect("/admin");
   const ctx = await getOrgCtx();
   if (ctx && !sp.denied) redirect(ctx.role === "learner" ? "/learn" : ctx.role === "teacher" ? "/teach" : "/church");
   const ms = await listMemberships(user.id);

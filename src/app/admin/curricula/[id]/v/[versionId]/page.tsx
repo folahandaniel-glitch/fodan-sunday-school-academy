@@ -25,7 +25,7 @@ export default async function VersionPage({ params }: { params: Promise<{ id: st
   const db = await getDb();
   const [c] = await db.select().from(schema.curricula).where(eq(schema.curricula.id, id));
   const v = b.version, editable = (EDITABLE as readonly string[]).includes(v.status);
-  const canReview = platformCan(user.platformRole, "curriculum.review"), canPublish = platformCan(user.platformRole, "curriculum.publish");
+  const canReview = platformCan(user, "curriculum.review"), canPublish = platformCan(user, "curriculum.publish");
   return (
     <>
       <PageHeader crumbs={[{ label: "Curriculum library", href: "/admin/curricula" }, { label: c.title, href: `/admin/curricula/${id}` }, { label: `Version ${v.versionNumber}` }]} title={`${c.title}: version ${v.versionNumber}`} sub={v.changeSummary || undefined} actions={<StatusBadge status={v.status} />} />

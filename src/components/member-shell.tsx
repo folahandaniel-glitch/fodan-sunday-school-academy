@@ -13,7 +13,7 @@ const BASIC: NavItem[] = [
 /** Shell for pages every signed-in member can reach (forum, profile, notifications), with navigation matching their role. */
 export async function MemberShell({ user, children }: { user: SessionUser; children: ReactNode }) {
   const ctx = await getOrgCtx();
-  const staff = platformCan(user.platformRole, "admin.access");
+  const staff = platformCan(user, "admin.access");
   const nav = staff ? [...ADMIN_NAV, { label: "Community Forum", href: "/forum", icon: "chat" }] : ctx ? (ctx.role === "learner" ? LEARNER_NAV : ctx.role === "teacher" ? TEACHER_NAV : CHURCH_NAV) : BASIC;
   return <AppShell user={user} nav={nav} area={staff ? "Platform administration" : ctx ? (ctx.role === "learner" ? "Learner" : ctx.role === "teacher" ? "Teacher" : "Church administration") : "Member"} orgName={ctx?.orgName} orgId={ctx?.orgId}>{children}</AppShell>;
 }

@@ -40,6 +40,12 @@ export const DEFAULTS = {
   logoPlacements: {} as Record<string, string>,
   maintenance: { suspended: false, message: "This service is temporarily unavailable. Please check back soon." },
   announcement: { enabled: false, text: "", href: "" },
+  /** Headings and introductions of public pages that are not built from page sections. {total}, {published} and {isAre} are filled in on the library page. */
+  pageText: {
+    library: { title: "Curriculum library", intro: "{total} Bible teaching curricula in five categories. Each runs for 26 weeks with a mid-session test, a final examination and a revision week. {published} {isAre} published and ready for churches to select; the rest are being prepared and reviewed." },
+    verify: { title: "Verify a certificate", intro: "Enter the verification code printed on the certificate (for example FSSA-XXXX-XXXX-XXXX)." },
+    pricing: { title: "Plans for every church", intro: "Registration is free. Paid plans add capacity and features, and are set and priced by the Academy. You can change plan at any time." },
+  },
   doctrine: {
     position: "This platform teaches from the Bible as the inspired Word of God and affirms the historic Christian faith. Where faithful Christians differ (for example on the timing and details of the end times), lessons present the main views fairly and say plainly that they are disputed. The approved doctrinal statement is edited by the Super Admin.",
   },

@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { requirePlatform } from "@/server/guards";
 import { listUsers } from "@/server/services/admin";
 import { ActionButton, ActionForm } from "@/components/forms";
-import { staffUserAction, userResetAction, userRevokeAction, userRoleAction, userStatusAction } from "@/app/actions/admin";
+import { userPermsAction, staffUserAction, userResetAction, userRevokeAction, userRoleAction, userStatusAction } from "@/app/actions/admin";
 import { Card, Empty, PageHeader, Pagination, StatusBadge, Table } from "@/components/ui";
-import { PLATFORM_ROLE_LABELS } from "@/lib/permissions";
+import { PLATFORM_GRANTABLE, PLATFORM_ROLE_LABELS } from "@/lib/permissions";
 import { fmtDate } from "@/lib/text";
 
 export const metadata: Metadata = { title: "Users" };
@@ -27,6 +27,27 @@ export default async function Users({ searchParams }: { searchParams: Promise<{ 
               <td><div className="flex flex-wrap gap-1">{u.id !== me.id && <ActionButton action={userStatusAction} fields={{ id: u.id, status: u.status === "suspended" ? "active" : "suspended" }} label={u.status === "suspended" ? "Reactivate" : "Suspend"} tone={u.status === "suspended" ? "light" : "danger"} confirm={u.status === "suspended" ? undefined : `Suspend ${u.name}?`} />}<ActionButton action={userResetAction} fields={{ id: u.id }} label="Reset password" confirm={`Reset ${u.name}'s password and show a temporary one?`} /><ActionButton action={userRevokeAction} fields={{ id: u.id }} label="End sessions" /></div></td></tr>
           ))}
         </tbody></Table>
+      )}
+      {me.platformRole === "super_admin" && d.rows.length > 0 && (
+        <Card className="mt-6"><h2 className="text-lg">Assign admin permissions</h2>
+          <p className="text-sm text-mist">Choose exactly what an individual may edit from the admin area, on top of their platform role. Changes are recorded in the audit log and apply on their next page load.</p>
+          <div className="mt-3 space-y-2">
+            {d.rows.filter(({ u }) => u.role !== "super_admin").map(({ u }) => (
+              <details key={u.id} className="rounded-xl border border-line p-3"><summary className="cursor-pointer text-sm font-semibold">{u.name} <span className="font-normal text-mist">· {u.email ?? u.username}{u.extraPerms?.length ? ` · ${u.extraPerms.length} granted` : ""}</span></summary>
+                <ActionForm action={userPermsAction} submit="Save permissions" className="mt-3">
+                  <input type="hidden" name="id" value={u.id} />
+                  <div className="grid gap-4 md:grid-cols-3">
+                    {Array.from(new Set(PLATFORM_GRANTABLE.map((g) => g.group))).map((grp) => (
+                      <fieldset key={grp} className="space-y-1"><legend className="text-xs font-bold uppercase tracking-wide text-mist">{grp}</legend>
+                        {PLATFORM_GRANTABLE.filter((g) => g.group === grp).map((g) => <label key={g.perm} className="flex items-start gap-2 text-sm"><input type="checkbox" name="perm" value={g.perm} defaultChecked={u.extraPerms?.includes(g.perm)} className="mt-1" /><span>{g.label}</span></label>)}
+                      </fieldset>
+                    ))}
+                  </div>
+                </ActionForm>
+              </details>
+            ))}
+          </div>
+        </Card>
       )}
       <Pagination page={d.page} pageSize={d.pageSize} total={d.total} base="/admin/users" params={{ q: sp.q, role: sp.role }} />
       <Card className="mt-6"><h2 className="text-lg">Add a staff account</h2><p className="text-sm text-mist">Curriculum reviewers, finance administrators and auditors. The person must change the temporary password at first sign-in. Super Admin status is granted separately and only to accounts with two-step verification on.</p>

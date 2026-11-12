@@ -15,7 +15,33 @@ export const PLATFORM_PERMS: Record<PlatformRole, PlatformPerm[]> = {
   auditor: ["admin.access", "audit.view", "reports.platform", "churches.view", "jobs.view"],
   member: [],
 };
-export const platformCan = (role: PlatformRole | undefined | null, p: PlatformPerm) => !!role && PLATFORM_PERMS[role]?.includes(p);
+/** Permissions the Super Admin may give to an individual person on top of their platform role. User, church and settings control stay with the Super Admin. */
+export const PLATFORM_GRANTABLE: { perm: PlatformPerm; group: string; label: string }[] = [
+  { perm: "site.edit", group: "Website", label: "Edit website pages, navigation, footer, contact details and banner" },
+  { perm: "branding.edit", group: "Website", label: "Change logos and branding" },
+  { perm: "curriculum.write", group: "Curriculum", label: "Write and edit curricula, lessons and questions" },
+  { perm: "curriculum.review", group: "Curriculum", label: "Review and approve curricula (Review all)" },
+  { perm: "curriculum.publish", group: "Curriculum", label: "Publish approved curricula (Publish all)" },
+  { perm: "forum.moderate", group: "Community", label: "Moderate the community forum" },
+  { perm: "plans.manage", group: "Commerce", label: "Edit subscription plans and access codes" },
+  { perm: "payments.view", group: "Commerce", label: "View payments and invoices" },
+  { perm: "churches.view", group: "Oversight", label: "View churches" },
+  { perm: "reports.platform", group: "Oversight", label: "View platform reports and analytics" },
+  { perm: "audit.view", group: "Oversight", label: "View the audit log" },
+  { perm: "jobs.view", group: "Oversight", label: "View background jobs" },
+];
+export const PLATFORM_GRANTABLE_PERMS = PLATFORM_GRANTABLE.map((g) => g.perm);
+type PlatformSubject = PlatformRole | { platformRole: PlatformRole; extraPerms?: readonly string[] };
+/** Role defaults plus any permissions the Super Admin granted to this person. */
+export function platformCan(subject: PlatformSubject | undefined | null, p: PlatformPerm): boolean {
+  if (!subject) return false;
+  const role = typeof subject === "string" ? subject : subject.platformRole;
+  if (PLATFORM_PERMS[role]?.includes(p)) return true;
+  if (typeof subject === "string") return false;
+  const extra = subject.extraPerms ?? [];
+  if (p === "admin.access") return extra.some((x) => (PLATFORM_GRANTABLE_PERMS as string[]).includes(x));
+  return (PLATFORM_GRANTABLE_PERMS as string[]).includes(p) && extra.includes(p);
+}
 
 export type OrgPerm =
   | "learn" | "org.profile.edit" | "org.settings" | "members.manage" | "classes.manage" | "curriculum.select" | "sessions.manage" | "attendance.record"

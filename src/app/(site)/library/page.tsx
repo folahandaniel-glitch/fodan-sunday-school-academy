@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getSetting } from "@/server/settings";
 import type { Metadata } from "next";
 import { listCatalog, listCategories } from "@/server/services/curriculum";
 import { Empty, Pagination } from "@/components/ui";
@@ -13,12 +14,13 @@ export default async function Library({ searchParams }: { searchParams: Promise<
     listCatalog({ q: sp.q?.slice(0, 80), category: sp.category, level: sp.level, tier: sp.tier, sort: sp.sort as "title" | "number" | undefined, page, pageSize: 12 }),
     listCategories(),
   ]);
+  const pt = await getSetting("pageText");
   const totalCurricula = cats.reduce((n, c) => n + c.total, 0);
   const published = cats.reduce((n, c) => n + c.published, 0);
   return (
     <div className="container-page py-10">
-      <h1 className="text-3xl sm:text-4xl">Curriculum library</h1>
-      <p className="mt-2 max-w-3xl text-mist">{totalCurricula} Bible teaching curricula in five categories. Each runs for 26 weeks with a mid-session test, a final examination and a revision week. {published} {published === 1 ? "is" : "are"} published and ready for churches to select; the rest are being prepared and reviewed.</p>
+      <h1 className="text-3xl sm:text-4xl">{pt.library.title}</h1>
+      <p className="mt-2 max-w-3xl text-mist">{pt.library.intro.replaceAll("{total}", String(totalCurricula)).replaceAll("{published}", String(published)).replaceAll("{isAre}", published === 1 ? "is" : "are")}</p>
       <form className="card card-pad mt-6 grid gap-3 sm:grid-cols-[2fr_1.5fr_1fr_auto]" role="search">
         <div><label className="label" htmlFor="q">Search</label><input id="q" name="q" defaultValue={sp.q} className="input" placeholder="e.g. prayer, marriage, Holy Spirit" /></div>
         <div><label className="label" htmlFor="category">Category</label>

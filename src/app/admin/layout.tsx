@@ -11,6 +11,6 @@ const NEEDS: Record<string, PlatformPerm> = {
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const user = await requirePlatform();
-  const nav = ADMIN_NAV.filter((n) => !NEEDS[n.href] || platformCan(user.platformRole, NEEDS[n.href]));
+  const nav = ADMIN_NAV.filter((n) => !NEEDS[n.href] || platformCan(user, NEEDS[n.href]));
   return <AppShell user={user} nav={nav} area="Platform administration">{children}</AppShell>;
 }

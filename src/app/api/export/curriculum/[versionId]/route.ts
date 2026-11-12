@@ -11,7 +11,7 @@ export const maxDuration = 60;
 /** DOCX export for Super Admin / curriculum editors. Teacher guides contain facilitator notes; this route is staff-only. */
 export async function GET(req: Request, { params }: { params: Promise<{ versionId: string }> }) {
   const s = await resolveToken((await cookies()).get(COOKIE)?.value);
-  if (!s || (s.user.totpEnabled && !s.mfaOk) || !platformCan(s.user.platformRole, "curriculum.write")) return new Response("Not allowed.", { status: 403 });
+  if (!s || (s.user.totpEnabled && !s.mfaOk) || !platformCan(s.user, "curriculum.write")) return new Response("Not allowed.", { status: 403 });
   const mode = new URL(req.url).searchParams.get("mode") === "student" ? "student" : "teacher";
   const { versionId } = await params;
   if (!/^[0-9a-f-]{36}$/.test(versionId)) return new Response("Not found.", { status: 404 });

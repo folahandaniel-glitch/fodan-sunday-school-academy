@@ -9,6 +9,7 @@ import { emailAdminsOf, queueEmail, flushOutbox } from "./notify";
 import { billingMaintenance } from "./billing";
 import { effectivePlan } from "./entitlements";
 import type { PlatformRole } from "../db/schema";
+import { PLATFORM_GRANTABLE_PERMS } from "@/lib/permissions";
 
 /* ============================ Churches ============================ */
 export async function listChurches(f: { q?: string; status?: string; page?: number; pageSize?: number } = {}) {
@@ -71,7 +72,7 @@ export async function listUsers(f: { q?: string; role?: string; status?: string;
   const db = await getDb();
   const ps = Math.min(f.pageSize ?? 25, 100), off = ((f.page ?? 1) - 1) * ps;
   const where = and(f.role ? eq(schema.users.platformRole, f.role as PlatformRole) : undefined, f.status ? eq(schema.users.status, f.status as "active") : undefined, f.q ? or(ilike(schema.users.fullName, `%${f.q}%`), ilike(schema.users.email, `%${f.q}%`)) : undefined);
-  const rows = await db.select({ u: { id: schema.users.id, name: schema.users.fullName, email: schema.users.email, username: schema.users.username, role: schema.users.platformRole, status: schema.users.status, lastLoginAt: schema.users.lastLoginAt, createdAt: schema.users.createdAt, mfa: schema.users.totpEnabled },
+  const rows = await db.select({ u: { id: schema.users.id, name: schema.users.fullName, email: schema.users.email, username: schema.users.username, role: schema.users.platformRole, status: schema.users.status, lastLoginAt: schema.users.lastLoginAt, createdAt: schema.users.createdAt, mfa: schema.users.totpEnabled, extraPerms: schema.users.extraPerms },
     church: sql<string | null>`(select o.name from organization_memberships m join organizations o on o.id = m.organization_id where m.user_id = ${qid(schema.users)} order by m.created_at limit 1)` })
     .from(schema.users).where(where).orderBy(desc(schema.users.createdAt)).limit(ps).offset(off);
   const [{ n }] = await db.select({ n: sql<number>`count(*)::int` }).from(schema.users).where(where);
@@ -186,3 +187,16 @@ export async function health() {
   return { database: "up", latencyMs: Date.now() - t0, email: process.env.RESEND_API_KEY ? "configured" : "not configured", payments: process.env.PAYSTACK_SECRET_KEY ? "configured" : "not configured", authSecret: process.env.AUTH_SECRET && process.env.AUTH_SECRET.length >= 32 ? "set" : "missing" };
 }
 export { asc };
+
+/** Super Admin only (enforced by the caller's users.manage gate plus this check): choose which admin areas a person may use on top of their platform role. Audited with before/after. Applies on their next request. */
+export async function setExtraPerms(actor: Actor, userId: string, perms: string[]) {
+  const db = await getDb();
+  const [u] = await db.select().from(schema.users).where(eq(schema.users.id, userId));
+  if (!u) throw new NotFoundError();
+  if (u.platformRole === "super_admin") throw new AccessError("The Super Admin already holds every permission.");
+  const clean = Array.from(new Set(perms)).filter((p) => (PLATFORM_GRANTABLE_PERMS as string[]).includes(p)).sort();
+  const before = (u.extraPerms ?? []) as string[];
+  await db.update(schema.users).set({ extraPerms: clean }).where(eq(schema.users.id, userId));
+  await audit(actor, "user.permissions_set", { type: "user", id: userId }, { before, after: clean });
+  return clean;
+}

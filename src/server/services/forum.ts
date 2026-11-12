@@ -40,7 +40,7 @@ export async function getThread(threadId: string, viewer: SessionUser) {
   const db = await getDb();
   if (!/^[0-9a-f-]{36}$/.test(threadId)) throw new NotFoundError();
   const [t] = await db.select().from(schema.forumThreads).where(eq(schema.forumThreads.id, threadId));
-  const mod = platformCan(viewer.platformRole, "forum.moderate");
+  const mod = platformCan(viewer, "forum.moderate");
   if (!t || (t.status === "hidden" && !mod)) throw new NotFoundError("Thread not found.");
   const [cat] = await db.select().from(schema.forumCategories).where(eq(schema.forumCategories.id, t.categoryId));
   const posts = await db.select().from(schema.forumPosts).where(and(eq(schema.forumPosts.threadId, threadId), mod ? undefined : eq(schema.forumPosts.status, "visible"))).orderBy(asc(schema.forumPosts.createdAt));
@@ -70,7 +70,7 @@ export async function createThread(user: SessionUser, categorySlug: string, titl
   const db = await getDb();
   const [cat] = await db.select().from(schema.forumCategories).where(eq(schema.forumCategories.slug, categorySlug));
   if (!cat) throw new NotFoundError("Category not found.");
-  if (cat.staffOnlyPosting && !platformCan(user.platformRole, "forum.moderate")) throw new AccessError("Only Academy staff can post in this category.");
+  if (cat.staffOnlyPosting && !platformCan(user, "forum.moderate")) throw new AccessError("Only Academy staff can post in this category.");
   const [row] = await db.insert(schema.forumThreads).values({ categoryId: cat.id, authorId: user.id, title: t, body: b }).returning({ id: schema.forumThreads.id });
   return { ok: true as const, id: row.id };
 }
@@ -95,19 +95,19 @@ export async function report(user: SessionUser, target: { threadId?: string; pos
 
 /* ---- moderation ---- */
 export async function moderate(actor: Actor, user: SessionUser, action: { kind: "thread" | "post"; id: string; to: "hidden" | "visible" | "locked"; pin?: boolean }) {
-  if (!platformCan(user.platformRole, "forum.moderate")) throw new AccessError();
+  if (!platformCan(user, "forum.moderate")) throw new AccessError();
   const db = await getDb();
   if (action.kind === "thread") await db.update(schema.forumThreads).set({ status: action.to, ...(action.pin !== undefined ? { pinned: action.pin } : {}) }).where(eq(schema.forumThreads.id, action.id));
   else await db.update(schema.forumPosts).set({ status: action.to === "hidden" ? "hidden" : "visible" }).where(eq(schema.forumPosts.id, action.id));
   await audit(actor, `forum.${action.kind}_${action.to}`, { type: `forum_${action.kind}`, id: action.id });
 }
 export async function openReports(user: SessionUser) {
-  if (!platformCan(user.platformRole, "forum.moderate")) throw new AccessError();
+  if (!platformCan(user, "forum.moderate")) throw new AccessError();
   const db = await getDb();
   return db.select({ r: schema.forumReports, reporter: schema.users.fullName }).from(schema.forumReports).innerJoin(schema.users, eq(schema.users.id, schema.forumReports.reporterId)).where(eq(schema.forumReports.status, "open")).orderBy(desc(schema.forumReports.createdAt)).limit(100);
 }
 export async function resolveReport(actor: Actor, user: SessionUser, id: string, status: "actioned" | "dismissed") {
-  if (!platformCan(user.platformRole, "forum.moderate")) throw new AccessError();
+  if (!platformCan(user, "forum.moderate")) throw new AccessError();
   const db = await getDb();
   await db.update(schema.forumReports).set({ status, handledBy: user.id }).where(eq(schema.forumReports.id, id));
 }

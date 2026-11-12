@@ -180,6 +180,9 @@ export async function userStatusAction(_: FormState | null, fd: FormData): Promi
 export async function userRoleAction(_: FormState | null, fd: FormData): Promise<FormState> {
   return run(async () => { const { a } = await actor("users.manage"); await admin.setPlatformRole(a, s(fd, "id"), s(fd, "role") as PlatformRole); return { message: "Role updated and the person's sessions were ended." }; });
 }
+export async function userPermsAction(_: FormState | null, fd: FormData): Promise<FormState> {
+  return run(async () => { const { u, a } = await actor("users.manage"); if (u.platformRole !== "super_admin") return fail("Only the Super Admin can assign admin permissions."); const p = await admin.setExtraPerms(a, s(fd, "id"), fd.getAll("perm").map(String)); return { message: p.length ? `${p.length} permission(s) saved. They apply on the person's next page load.` : "Extra permissions removed." }; });
+}
 export async function userResetAction(_: FormState | null, fd: FormData): Promise<FormState> {
   return run(async () => { const { a } = await actor("users.manage"); const t = await admin.adminResetPassword(a, s(fd, "id")); return { message: `Temporary password (shown once): ${t}` }; });
 }
@@ -252,8 +255,9 @@ export async function removeLogoAction(_: FormState | null, fd: FormData): Promi
 }
 export async function saveSettingAction(_: FormState | null, fd: FormData): Promise<FormState> {
   return run(async () => {
-    const { a } = await actor("settings.manage");
     const key = s(fd, "key");
+    // Website text settings need only site.edit, so an assigned website editor can really save them; everything else stays settings.manage.
+    const { a } = await actor(["nav", "footer", "contact", "social", "announcement", "pageText"].includes(key) ? "site.edit" : "settings.manage");
     if (key === "features") {
       const cur = await getSetting("features");
       await cms.saveSettingGroup(a, "features", { ...cur, memberRegistrationOpen: b(fd, "memberRegistrationOpen"), churchRegistrationOpen: b(fd, "churchRegistrationOpen"), requireChurchAccessCode: b(fd, "requireChurchAccessCode"), requireChurchApproval: b(fd, "requireChurchApproval"), requireEmailVerification: b(fd, "requireEmailVerification"), allowTypedChurchNames: b(fd, "allowTypedChurchNames"), forumEnabled: b(fd, "forumEnabled"), forumRequiresVerifiedEmail: b(fd, "forumRequiresVerifiedEmail"), requireHumanReview: b(fd, "requireHumanReview"), maxFailedLogins: n(fd, "maxFailedLogins", 6), lockMinutes: n(fd, "lockMinutes", 15), graceDays: n(fd, "graceDays", 7), defaultCurrency: s(fd, "defaultCurrency") || "NGN" });
@@ -265,6 +269,11 @@ export async function saveSettingAction(_: FormState | null, fd: FormData): Prom
     else if (key === "maintenance") await cms.saveSettingGroup(a, "maintenance", { suspended: b(fd, "suspended"), message: s(fd, "message") });
     else if (key === "assessment") { const cur = await getSetting("assessment"); await cms.saveSettingGroup(a, "assessment", { ...cur, defaultPassPercent: n(fd, "defaultPassPercent", 50), gradeScale: lines(fd, "gradeScale").map((l) => { const [min, grade, label] = l.split(/[,|]/).map((x) => x.trim()); return { min: Number(min), grade, label }; }).filter((g) => Number.isFinite(g.min) && g.grade) }); }
     else if (key === "certificate") await cms.saveSettingGroup(a, "certificate", { title: s(fd, "title"), signatoryName: s(fd, "signatoryName"), signatoryTitle: s(fd, "signatoryTitle"), footerNote: s(fd, "footerNote") });
+    else if (key === "pageText") {
+      const cur = await getSetting("pageText");
+      const pick = (k: "library" | "verify" | "pricing") => ({ title: s(fd, `${k}.title`) || cur[k].title, intro: s(fd, `${k}.intro`) || cur[k].intro });
+      await cms.saveSettingGroup(a, "pageText", { library: pick("library"), verify: pick("verify"), pricing: pick("pricing") });
+    }
     else if (key === "doctrine") await cms.saveSettingGroup(a, "doctrine", { position: s(fd, "position") });
     else return fail("Unknown setting group.");
     return { message: "Saved." };

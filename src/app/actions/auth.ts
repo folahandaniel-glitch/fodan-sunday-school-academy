@@ -26,7 +26,7 @@ export async function loginAction(_: FormState | null, fd: FormData): Promise<Fo
   if (r.mustChangePassword) return { ok: true, redirect: "/account/password?first=1" };
   const db = await getDb();
   const [u] = await db.select().from(schema.users).where(eq(schema.users.id, r.userId));
-  return { ok: true, redirect: next ?? (await homeFor({ id: u.id, platformRole: u.platformRole } as never)) };
+  return { ok: true, redirect: next ?? (await homeFor({ id: u.id, platformRole: u.platformRole, extraPerms: u.extraPerms } as never)) };
 }
 
 export async function mfaAction(_: FormState | null, fd: FormData): Promise<FormState> {

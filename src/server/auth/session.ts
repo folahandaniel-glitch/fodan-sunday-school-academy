@@ -9,7 +9,7 @@ import type { PlatformRole } from "../db/schema";
 export const COOKIE = process.env.NODE_ENV === "production" ? "__Host-fssa_session" : "fssa_session";
 
 export interface SessionUser {
-  id: string; email: string | null; username: string | null; fullName: string; platformRole: PlatformRole; status: string;
+  id: string; email: string | null; username: string | null; fullName: string; platformRole: PlatformRole; extraPerms: string[]; status: string;
   mustChangePassword: boolean; totpEnabled: boolean; isMinor: boolean; timezone: string;
 }
 export interface Ctx { ip: string | null; userAgent: string | null }
@@ -64,7 +64,7 @@ export async function resolveToken(token: string | undefined | null): Promise<Re
   if (u.status === "suspended" || u.status === "deactivated") return null;
   return {
     sessionId: row.sessionId, recentAuthAt: row.recentAuthAt, mfaOk: row.mfaOk, activeOrgId: row.activeOrgId,
-    user: { id: u.id, email: u.email, username: u.username, fullName: u.fullName, platformRole: u.platformRole, status: u.status, mustChangePassword: u.mustChangePassword, totpEnabled: u.totpEnabled, isMinor: u.isMinor, timezone: u.timezone },
+    user: { id: u.id, email: u.email, username: u.username, fullName: u.fullName, platformRole: u.platformRole, extraPerms: u.extraPerms ?? [], status: u.status, mustChangePassword: u.mustChangePassword, totpEnabled: u.totpEnabled, isMinor: u.isMinor, timezone: u.timezone },
   };
 }
 

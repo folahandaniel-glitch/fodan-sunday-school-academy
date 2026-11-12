@@ -17,6 +17,8 @@ export const users = pgTable("users", {
   phone: text("phone"),
   passwordHash: text("password_hash").notNull(),
   platformRole: text("platform_role").$type<PlatformRole>().notNull().default("member"),
+  /** Extra platform permissions granted to this person by the Super Admin (see PLATFORM_GRANTABLE in lib/permissions). */
+  extraPerms: jsonb("extra_perms").$type<string[]>().notNull().default([]),
   status: text("status").$type<"active" | "pending" | "suspended" | "deactivated">().notNull().default("active"),
   emailVerifiedAt: tstz("email_verified_at"),
   mustChangePassword: boolean("must_change_password").notNull().default(false),

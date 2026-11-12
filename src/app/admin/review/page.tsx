@@ -27,8 +27,8 @@ export default async function ReviewQueue() {
         <Card className="mb-4"><h2 className="text-lg">Quick actions</h2>
           <p className="mt-1 text-sm text-mist">Work through the whole queue in two clicks. <strong>Review all</strong> approves (and freezes) every waiting version that passes the completeness checks. <strong>Publish all</strong> then releases every approved version to churches. Failures are skipped and listed; nothing is changed for them.</p>
           <div className="mt-3 flex flex-wrap items-start gap-4">
-            {platformCan(user.platformRole, "curriculum.review") && rows.length > 0 && <ActionForm action={reviewAllAction} submit={`Review all (${valid.length} ready)`} submitClass="btn-primary" confirm={`Approve all ${valid.length} curricula that pass the checks? Approved versions are frozen; you can still publish them afterwards.`}><span /></ActionForm>}
-            {platformCan(user.platformRole, "curriculum.publish") && approved.length > 0 && <ActionForm action={publishAllAction} submit={`Publish all (${approved.length} approved)`} submitClass="btn-gold" confirm={`Publish all ${approved.length} approved curricula so churches can select them?`}><span /></ActionForm>}
+            {platformCan(user, "curriculum.review") && rows.length > 0 && <ActionForm action={reviewAllAction} submit={`Review all (${valid.length} ready)`} submitClass="btn-primary" confirm={`Approve all ${valid.length} curricula that pass the checks? Approved versions are frozen; you can still publish them afterwards.`}><span /></ActionForm>}
+            {platformCan(user, "curriculum.publish") && approved.length > 0 && <ActionForm action={publishAllAction} submit={`Publish all (${approved.length} approved)`} submitClass="btn-gold" confirm={`Publish all ${approved.length} approved curricula so churches can select them?`}><span /></ActionForm>}
           </div>
         </Card>
       )}
@@ -37,7 +37,7 @@ export default async function ReviewQueue() {
           {rows.map(({ v, c }) => (<tr key={v.id}><td>{c.catalogNumber}</td><td className="font-semibold">{c.title}</td><td>v{v.versionNumber}</td><td className="text-xs">{v.provenance === "seed" ? "AI-assisted draft" : v.provenance}</td><td>{(v.validation as { ok?: boolean }).ok ? <Badge tone="ok">passes</Badge> : <Badge tone="bad">fails</Badge>}</td><td className="text-xs">{fmtDateTime(v.updatedAt)}</td><td><Link className="btn btn-primary btn-sm" href={`/admin/curricula/${c.id}/v/${v.id}`}>Review</Link></td></tr>))}
         </tbody></Table>
       )}
-      {platformCan(user.platformRole, "curriculum.publish") && valid.length > 0 && (
+      {platformCan(user, "curriculum.publish") && valid.length > 0 && (
         <Card className="mt-6"><h2 className="text-lg">Approve and publish in bulk</h2><p className="text-sm text-mist">For the product owner, after reading the material. Approves and publishes {valid.length} version(s) that pass every completeness check; the action is recorded in the audit log under your name.</p>
           <ActionForm action={approveAllAction} submit={`Approve and publish ${valid.length} curriculum version(s)`} className="mt-3" submitClass="btn-gold" confirm={`Confirm that you have reviewed these ${valid.length} curricula and want churches to be able to use them.`}><span /></ActionForm></Card>
       )}

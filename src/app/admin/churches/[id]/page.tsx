@@ -18,7 +18,7 @@ export default async function ChurchPage({ params }: { params: Promise<{ id: str
   let d;
   try { d = await churchDetail((await params).id); } catch (e) { if (e instanceof NotFoundError) notFound(); throw e; }
   const o = d.org;
-  const manage = platformCan(user.platformRole, "churches.manage");
+  const manage = platformCan(user, "churches.manage");
   const [plans, others] = manage ? await Promise.all([allPlans(), listChurches({ status: "active", pageSize: 100 })]) : [[], { rows: [] }];
   const n = (role: string, status = "active") => d.counts.find((c) => c.role === role && c.status === status)?.n ?? 0;
   return (
@@ -44,7 +44,7 @@ export default async function ChurchPage({ params }: { params: Promise<{ id: str
         <Card className="mt-4"><h2 className="text-lg">Merge into an existing church</h2><p className="text-sm text-mist">If members typed the name of a church that is already registered, merge this listing into it. Members move across as <em>pending</em>, so the real church&apos;s administrator still decides.</p>
           <ActionForm action={mergeChurchAction} submit="Merge" className="mt-2" confirm="Merge this listing into the selected church? This cannot be undone."><input type="hidden" name="from" value={o.id} /><select name="into" className="input" required aria-label="Church to merge into">{others.rows.filter((r) => r.o.id !== o.id).map((r) => <option key={r.o.id} value={r.o.id}>{r.o.name} ({r.o.city})</option>)}</select></ActionForm></Card>
       )}
-      {manage && platformCan(user.platformRole, "plans.manage") && (
+      {manage && platformCan(user, "plans.manage") && (
         <Card className="mt-4"><h2 className="text-lg">Grant a plan</h2><p className="text-sm text-mist">For scholarships or payments received outside the app. Audited.</p>
           <ActionForm action={grantPlanAction} submit="Grant plan" className="mt-2"><input type="hidden" name="orgId" value={o.id} /><div className="grid gap-3 sm:grid-cols-3"><div><label className="label" htmlFor="planId">Plan</label><select id="planId" name="planId" className="input">{plans.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</select></div><div><label className="label" htmlFor="days">Days</label><input id="days" name="days" type="number" min={1} defaultValue={365} className="input" /></div><div><label className="label" htmlFor="source">Reason</label><select id="source" name="source" className="input"><option value="admin_grant">Manual payment or grant</option><option value="scholarship">Scholarship</option></select></div></div></ActionForm></Card>
       )}
